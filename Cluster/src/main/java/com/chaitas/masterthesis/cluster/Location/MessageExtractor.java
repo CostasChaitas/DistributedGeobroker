@@ -1,8 +1,8 @@
 package com.chaitas.masterthesis.cluster.Location;
 
 import akka.cluster.sharding.ShardRegion;
-import com.chaitas.masterthesis.cluster.Messages.processPUBLISH;
-import com.chaitas.masterthesis.cluster.Messages.processSUBSCRIBE;
+import com.chaitas.masterthesis.cluster.Messages.ProcessPUBLISH;
+import com.chaitas.masterthesis.cluster.Messages.ProcessSUBSCRIBE;
 import com.chaitas.masterthesis.commons.spatial.Location;
 
 
@@ -15,11 +15,11 @@ public class MessageExtractor {
         public String entityId(Object msg) {
             System.out.println("entityId : " + msg);
 
-           if (msg instanceof processPUBLISH) {
-               System.out.println(String.valueOf(((processPUBLISH) msg).tileId));
-               return String.valueOf(((processPUBLISH) msg).tileId);
-           } else if (msg instanceof processSUBSCRIBE)
-               return String.valueOf(((processSUBSCRIBE) msg).tileId);
+           if (msg instanceof ProcessPUBLISH) {
+               System.out.println(String.valueOf(((ProcessPUBLISH) msg).tileId));
+               return String.valueOf(((ProcessPUBLISH) msg).tileId);
+           } else if (msg instanceof ProcessSUBSCRIBE)
+               return String.valueOf(((ProcessSUBSCRIBE) msg).tileId);
            else
                 return null;
         }
@@ -28,7 +28,7 @@ public class MessageExtractor {
         @Override
         public Object entityMessage(Object msg) {
             System.out.println("entityMessage : " + msg);
-            if (msg instanceof processPUBLISH || msg instanceof processSUBSCRIBE)
+            if (msg instanceof ProcessPUBLISH || msg instanceof ProcessSUBSCRIBE)
                 return msg;
             else
                 return msg;
@@ -53,11 +53,11 @@ public class MessageExtractor {
                 // } else if (message instanceof ShardRegion.StartEntity) {
                 //   long id = ((ShardRegion.StartEntity) message).id;
                 //   return String.valueOf(id % numberOfShards)
-            } else if (msg instanceof processPUBLISH) {
-                long id = ((processPUBLISH) msg).tileId;
+            } else if (msg instanceof ProcessPUBLISH) {
+                long id = ((ProcessPUBLISH) msg).tileId;
                 return String.valueOf(id % numberOfShards);
-            } else if (msg instanceof processSUBSCRIBE) {
-                long id = ((processSUBSCRIBE) msg).tileId;
+            } else if (msg instanceof ProcessSUBSCRIBE) {
+                long id = ((ProcessSUBSCRIBE) msg).tileId;
                 return String.valueOf(id % numberOfShards);
             }else {
                 return null;

@@ -7,16 +7,13 @@ import akka.cluster.sharding.ShardRegion;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
-import com.chaitas.masterthesis.cluster.Messages.processPUBLISH;
-import com.chaitas.masterthesis.cluster.Messages.sendSUBACK;
-import com.chaitas.masterthesis.cluster.Messages.processSUBSCRIBE;
+import com.chaitas.masterthesis.cluster.Messages.*;
 import com.chaitas.masterthesis.commons.ControlPacketType;
 import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.InternalServerMessage;
 import com.chaitas.masterthesis.commons.message.Topic;
+import com.chaitas.masterthesis.commons.payloads.PUBACKPayload;
 import com.chaitas.masterthesis.commons.payloads.SUBACKPayload;
-import com.chaitas.masterthesis.commons.spatial.Location;
-
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -31,7 +28,7 @@ public class TileManager extends AbstractActor {
     private LoggingAdapter log = Logging.getLogger(getContext().system(), getSelf().path().toStringWithAddress(actorSystemAddress));
     private String tileId;
 
-    private static Map<Topic, List<processSUBSCRIBE>> subs = new ConcurrentHashMap<>();
+    private static Map<Topic, Map<String, ProcessSUBSCRIBE>> subs = new ConcurrentHashMap<>();
 
     @Override
     public void preStart() throws Exception {
@@ -51,82 +48,17 @@ public class TileManager extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
 
-                .match(String.class, message-> receiveString(message))
+                .match(ProcessSUBSCRIBE.class, message-> receiveProcessSUBSCRIBE(message))
 
-                .match(processPUBLISH.class, message-> receiveProcessPUBLISH(message))
-                .match(processSUBSCRIBE.class, message-> receiveProcessSUBSCRIBE(message))
-
-                .match(Location.class, message-> receiveLocation(message))
+                .match(ProcessPUBLISH.class, message-> receiveProcessPUBLISH(message))
 
                 // .matchEquals(ReceiveTimeout.getInstance(), msg -> passivate())
                 .build();
     }
 
-    private void receiveLocation(Location message) {
 
-        log.info("TileManager actor received Location : " + message);
-        getSender().tell("Customer: " +
-                getSelf().path().toStringWithAddress(actorSystemAddress) + "\n", getSelf());
-    }
-
-    private void receiveString(String message) {
-        log.info("TileManager actor received String : " + message);
-    }
-
-
-    private void receiveProcessPUBLISH(processPUBLISH processPublish){
-        log.info("TileManager actor received processPUBLISH " + tileId);
-
-        List<processSUBSCRIBE> subsForTopic = topicMatching(processPublish);
-
-        InternalServerMessage PUBACK = new InternalServerMessage(
-                processPublish.message.getClientIdentifier(),
-                ControlPacketType.PUBACK,
-                processPublish.message.getPayload()
-        );
-        processPublish.wsClientActor.tell(PUBACK, getSender());
-
-        log.info("Sending PUBACK : " + PUBACK + " to clientActor : " + processPublish.wsClientActor);
-
-        if(subsForTopic != null){
-            // make forEach here
-            for(int i=0; i< subsForTopic.size(); i++){
-
-                log.info("Sending message : " + processPublish.message.getPayload().getPUBLISHPayload().getContent() + " to subscriber : " + subsForTopic.get(i).wsClientActor);
-
-                InternalServerMessage PUBLISH = new InternalServerMessage(
-                        subsForTopic.get(i).message.getClientIdentifier(),
-                        ControlPacketType.PUBLISH,
-                        processPublish.message.getPayload()
-                );
-
-                subsForTopic.get(i).wsClientActor.tell(PUBLISH, getSelf());
-            }
-        }
-
-
-    }
-
-
-//    private void subscriberGeoMatching(processSUBSCRIBE processSubscribe, processPUBLISH processPublish){
-//        if(processSubscribe.message.getPayload().getSUBSCRIBEPayload().geofence.){
-//
-//        }
-//
-//    }
-
-
-    private List<processSUBSCRIBE> topicMatching(processPUBLISH processPublish) {
-        Topic topic = processPublish.message.getPayload().getPUBLISHPayload().getTopic();
-        log.info("Topic matching for topic " + topic);
-
-        List<processSUBSCRIBE> subsForTopic = subs.get(topic);
-        log.info("Topic matching found " + subsForTopic.size() + " for topic " + topic);
-        return subsForTopic;
-    }
-
-    private void receiveProcessSUBSCRIBE(processSUBSCRIBE processSubscribe){
-        log.info("TileManager actor received processSUBSCRIBE " + tileId);
+    private void receiveProcessSUBSCRIBE(ProcessSUBSCRIBE processSubscribe){
+        log.info("TileManager actor received ProcessSUBSCRIBE " + tileId);
 
         // Create SUBACK
         SUBACKPayload subackPayload = new SUBACKPayload(ReasonCode.Success);
@@ -135,24 +67,64 @@ public class TileManager extends AbstractActor {
                 ControlPacketType.SUBACK,
                 subackPayload
         );
-
-        sendSUBACK sendSuback = new sendSUBACK(SUBACK);
-        // Sending sendSUBACK to the responsible wsClientActor
+        SendSUBACK sendSuback = new SendSUBACK(SUBACK);
+        // Sending SendSUBACK to the responsible wsClientActor
         processSubscribe.wsClientActor.tell(sendSuback, getSender());
+        log.info("Sending SUBACK : " + SUBACK + " to clientActor : " + processSubscribe.wsClientActor);
 
         // Register Subscription
         Topic topic = processSubscribe.message.getPayload().getSUBSCRIBEPayload().getTopic();
-        List<processSUBSCRIBE> subsForTopic = subs.get(topic);
+        Map<String, ProcessSUBSCRIBE> subsForTopic = subs.get(topic);
 
         if(subsForTopic == null ){
-            subsForTopic = new ArrayList<>();
+            subsForTopic = new ConcurrentHashMap<>();
         }
 
-        subsForTopic.add(processSubscribe);
+        subsForTopic.put(processSubscribe.message.getClientIdentifier(), processSubscribe);
+
         subs.put(topic, subsForTopic);
+
         log.info("There are  : " + subsForTopic.size() + " subs for topic "   + topic + " in tile " + tileId);
 
     }
 
+    private void receiveProcessPUBLISH(ProcessPUBLISH processPublish){
+        log.info("TileManager actor received ProcessPUBLISH " + tileId);
+
+        // Create PUBACK
+        PUBACKPayload pubackPayload = new PUBACKPayload(ReasonCode.Success);
+        InternalServerMessage PUBACK = new InternalServerMessage(
+                processPublish.message.getClientIdentifier(),
+                ControlPacketType.PUBACK,
+                pubackPayload
+        );
+        SendPUBACK sendPuback = new SendPUBACK(PUBACK);
+        // Sending SendPUBACK to the responsible wsClientActor
+        processPublish.wsClientActor.tell(sendPuback, getSender());
+        log.info("Sending PUBACK : " + PUBACK + " to clientActor : " + processPublish.wsClientActor);
+
+        // Do the topic matching
+        List<ProcessSUBSCRIBE> subsForTopic = topicMatching(processPublish);
+
+        if(subsForTopic != null){
+            log.info("Topic matching found " + subsForTopic.size() + " subscriptions");
+
+            // make forEach here
+            for(int i=0; i< subsForTopic.size(); i++){
+
+                GeoMatching geoMatching = new GeoMatching(processPublish, subsForTopic.get(i));
+                subsForTopic.get(i).wsClientActor.tell(geoMatching, getSelf());
+
+            }
+        }
+
+    }
+
+    private List<ProcessSUBSCRIBE> topicMatching(ProcessPUBLISH processPublish) {
+        Topic topic = processPublish.message.getPayload().getPUBLISHPayload().getTopic();
+        Map<String, ProcessSUBSCRIBE> subsForTopicPerClient = subs.get(topic);
+        List<ProcessSUBSCRIBE> subsForTopic = new ArrayList(subsForTopicPerClient.values());
+        return subsForTopic;
+    }
 
 }

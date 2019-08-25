@@ -1,8 +1,8 @@
 package com.chaitas.masterthesis.cluster.util;
 
 import akka.actor.FunctionRef;
-import com.chaitas.masterthesis.cluster.Messages.processPUBLISH;
-import com.chaitas.masterthesis.cluster.Messages.processSUBSCRIBE;
+import com.chaitas.masterthesis.cluster.Messages.ProcessPUBLISH;
+import com.chaitas.masterthesis.cluster.Messages.ProcessSUBSCRIBE;
 import com.chaitas.masterthesis.commons.ControlPacketType;
 import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.InternalServerMessage;
@@ -28,8 +28,8 @@ public class AkkaKryoInitializer {
         kryo.register(Location.class, 262);
         kryo.register(Geofence.class, 263);
         kryo.register(Topic.class, 264);
-        kryo.register(processPUBLISH.class, 265);
-        kryo.register(processSUBSCRIBE.class, 266);
+        kryo.register(ProcessPUBLISH.class, 265);
+        kryo.register(ProcessSUBSCRIBE.class, 266);
         kryo.register(InternalServerMessage.class, 267);
         kryo.register(PUBLISHPayload.class, 268);
         kryo.register(SUBSCRIBEPayload.class, 269);
