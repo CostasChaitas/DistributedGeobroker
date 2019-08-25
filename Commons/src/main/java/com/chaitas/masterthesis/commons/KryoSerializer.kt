@@ -61,18 +61,35 @@ class KryoSerializer {
                 }
             }
         })
+//        kryo.register(Geofence::class.java, object : Serializer<Geofence>() {
+//            override fun write(kryo: Kryo, output: Output, o: Geofence) {
+//                kryo.writeObjectOrNull(output, o.location, Location::class.java)
+//                kryo.writeObjectOrNull(output, o.radiusDegree, Double::class.javaPrimitiveType)
+//            }
+//
+//            override fun read(kryo: Kryo, input: Input, aClass: Class<Geofence>): Geofence? {
+//                val location = kryo.readObjectOrNull(input, Location::class.java) ?: return null
+//                val radiusDegree = kryo.readObjectOrNull(input, Double::class.javaPrimitiveType!!) ?: return null
+//                return Geofence(location, radiusDegree)
+//            }
+//        })
+
         kryo.register(Geofence::class.java, object : Serializer<Geofence>() {
             override fun write(kryo: Kryo, output: Output, o: Geofence) {
-                kryo.writeObjectOrNull(output, o.location, Location::class.java)
-                kryo.writeObjectOrNull(output, o.radiusDegree, Double::class.javaPrimitiveType)
+                kryo.writeObjectOrNull(output, o.wktString, String::class.java)
             }
 
             override fun read(kryo: Kryo, input: Input, aClass: Class<Geofence>): Geofence? {
-                val location = kryo.readObjectOrNull(input, Location::class.java) ?: return null
-                val radiusDegree = kryo.readObjectOrNull(input, Double::class.javaPrimitiveType!!) ?: return null
-                return Geofence(location, radiusDegree)
+                try {
+                    val str = kryo.readObjectOrNull(input, String::class.java) ?: return null
+                    return Geofence(str)
+                } catch (ex: Exception) {
+                    return null
+                }
+
             }
         })
+
         kryo.register(Topic::class.java, object : Serializer<Topic>() {
             override fun write(kryo: Kryo, output: Output, o: Topic) {
                 kryo.writeObjectOrNull(output, o.topic, String::class.java)

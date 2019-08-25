@@ -1,36 +1,51 @@
 package com.chaitas.masterthesis.commons.spatial;
 
+import static com.chaitas.masterthesis.commons.spatial.SpatialContext.GEO;
+import static org.locationtech.spatial4j.distance.DistanceUtils.DEG_TO_KM;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jetbrains.annotations.NotNull;
+import org.locationtech.spatial4j.shape.Point;
 
 public class Location {
 
-    public double lat;
-    public double lon;
-    @JsonIgnore
+    private final Point point;
     public boolean undefined = false;
 
-    public Location(
-             @JsonProperty("lat") double lat,
-             @JsonProperty("lon") double lon) {
-        this.lat = lat;
-        this.lon = lon;
+    public Location(@NotNull @JsonProperty("lat") double lat,
+                    @NotNull @JsonProperty("lon") double lon) {
+        point = GEO.getShapeFactory().pointXY(lat, lon);
     }
 
     @JsonIgnore
     public Location(boolean undefined) {
         this.undefined = undefined;
+        this.point = null;
     }
 
-    @JsonIgnore
-    public static Location undefined() {
-        return new Location(true);
+    // Distance between this location and the given one, as determined by the Haversine formula, in km
+    public double distanceKmTo(Location toL) {
+        return distanceRadiansTo(toL) * DEG_TO_KM;
     }
 
-    public double getLat() { return lat; }
+    // Distance between this location and the given one, as determined by the Haversine formula, in radians
+    public double distanceRadiansTo(Location toL) {
+        return GEO.getDistCalc().distance(point, toL.getLocation());
+    }
+
+    public double getLat() {
+        return point.getX();
+    }
+
     public double getLon() {
-        return lon;
+        return point.getY();
     }
+
+    public Point getLocation() {
+        return this.point;
+    }
+
     @JsonIgnore
     public boolean isUndefined() { return undefined; }
 }

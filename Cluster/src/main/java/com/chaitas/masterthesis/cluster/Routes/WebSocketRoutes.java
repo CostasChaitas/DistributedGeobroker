@@ -14,11 +14,13 @@ import akka.stream.javadsl.Flow;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import akka.util.ByteString;
-import com.chaitas.masterthesis.cluster.Actors.Frontend;
+import com.chaitas.masterthesis.cluster.Actors.WsClientActor;
 import com.chaitas.masterthesis.cluster.Messages.OutgoingDestination;
 import com.chaitas.masterthesis.cluster.util.JSONable;
 import com.chaitas.masterthesis.commons.KryoSerializer;
+import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.InternalServerMessage;
+import com.chaitas.masterthesis.commons.payloads.INCOMPATIBLEPayload;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +69,9 @@ public class WebSocketRoutes extends AllDirectives {
 
     private Flow<Message, Message, NotUsed> createWebSocketFlow(String connectionId) {
 
-        ActorRef frontendActor = system.actorOf(Props.create(Frontend.class, shardRegion));
+        ActorRef wsClientActor = system.actorOf(Props.create(WsClientActor.class, shardRegion));
 
-        connections.put(connectionId, frontendActor);
+        connections.put(connectionId, wsClientActor);
         System.out.println("Connection added: " + connections.size());
 
         // Outgoing  messages
@@ -79,7 +81,7 @@ public class WebSocketRoutes extends AllDirectives {
                     return (Message) TextMessage.create(json);
                 })
                 .mapMaterializedValue(destinationRef -> {
-                    frontendActor.tell(new OutgoingDestination(destinationRef), ActorRef.noSender());
+                    wsClientActor.tell(new OutgoingDestination(destinationRef), ActorRef.noSender());
                     return NotUsed.getInstance();
                 });
 
@@ -107,8 +109,7 @@ public class WebSocketRoutes extends AllDirectives {
 
                         } else {
                             System.out.println("Received an incompatible text message: +" + msg);
-                            //return new BADPayload("Incompatible Payload", ReasonCode.IncompatiblePayload, "MAKE THE CLIENT ID INTERNAL!!");
-                            return null;
+                            return new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload);
                         }
                     } else{
                         // Message is Binary
@@ -126,14 +127,13 @@ public class WebSocketRoutes extends AllDirectives {
                             );
                         }else{
                             System.out.println("Received an incompatible binary message: +" + msg);
-                            //return new BADPayload("Incompatible Payload", ReasonCode.IncompatiblePayload, "MAKE THE CLIENT ID INTERNAL!!");
-                            return null;
+                            return new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload);
                         }
 
                     }
 
                 })
-                .to(Sink.actorRef(frontendActor, PoisonPill.getInstance() ));
+                .to(Sink.actorRef(wsClientActor, PoisonPill.getInstance() ));
 
         return Flow.fromSinkAndSource(sink, source);
     }

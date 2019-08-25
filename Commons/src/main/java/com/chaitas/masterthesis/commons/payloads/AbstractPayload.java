@@ -10,10 +10,17 @@ import org.jetbrains.annotations.Nullable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@payloadType")
 @JsonSubTypes({
+        @JsonSubTypes.Type(value = CONNECTPayload.class, name = "CONNECTPayload"),
+        @JsonSubTypes.Type(value = CONNACKPayload.class, name = "CONNACKPayload"),
+        @JsonSubTypes.Type(value = DISCONNECTPayload.class, name = "DISCONNECTPayload"),
+        @JsonSubTypes.Type(value = PINGREQPayload.class, name = "PINGREQPayload"),
+        @JsonSubTypes.Type(value = PINGRESPPayload.class, name = "PINGRESPPayload"),
         @JsonSubTypes.Type(value = SUBSCRIBEPayload.class, name = "SUBSCRIBEPayload"),
         @JsonSubTypes.Type(value = PUBLISHPayload.class, name = "PUBLISHPayload"),
         @JsonSubTypes.Type(value = SUBACKPayload.class, name = "SUBACKPayload"),
-        @JsonSubTypes.Type(value = PUBACKPayload.class, name = "PUBACKPayload")
+        @JsonSubTypes.Type(value = PUBACKPayload.class, name = "PUBACKPayload"),
+        @JsonSubTypes.Type(value = INCOMPATIBLEPayload.class, name = "INCOMPATIBLEPayload"),
+
 })
 public abstract class AbstractPayload {
 
@@ -81,6 +88,12 @@ public abstract class AbstractPayload {
     @Nullable
     public final UNSUBACKPayload getUNSUBACKPayload() {
         return this instanceof UNSUBACKPayload ? (UNSUBACKPayload)this : null;
+    }
+
+    @JsonIgnore
+    @Nullable
+    public final INCOMPATIBLEPayload getINCOMPATIBLEPayload() {
+        return this instanceof INCOMPATIBLEPayload ? (INCOMPATIBLEPayload)this : null;
     }
 
 }

@@ -57,7 +57,6 @@ public class InternalServerMessage {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(getClientIdentifier(), getControlPacketType(), getPayload());
     }
 }

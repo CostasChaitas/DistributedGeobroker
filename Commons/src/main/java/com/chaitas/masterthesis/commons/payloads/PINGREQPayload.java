@@ -8,7 +8,7 @@ public class PINGREQPayload extends AbstractPayload {
 
     public Location location;
 
-    public PINGREQPayload(@NotNull @JsonProperty("topic") Location location){
+    public PINGREQPayload(@NotNull @JsonProperty("location") Location location){
         this.location = location;
     }
 }

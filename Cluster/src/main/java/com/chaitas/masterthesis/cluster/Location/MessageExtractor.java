@@ -15,10 +15,7 @@ public class MessageExtractor {
         public String entityId(Object msg) {
             System.out.println("entityId : " + msg);
 
-           if (msg instanceof Location) {
-                System.out.println("testingout : " + String.valueOf(((Location) msg).lat));
-                return String.valueOf(((Location) msg).lat);
-           }else if (msg instanceof processPUBLISH) {
+           if (msg instanceof processPUBLISH) {
                System.out.println(String.valueOf(((processPUBLISH) msg).tileId));
                return String.valueOf(((processPUBLISH) msg).tileId);
            } else if (msg instanceof processSUBSCRIBE)
@@ -31,9 +28,7 @@ public class MessageExtractor {
         @Override
         public Object entityMessage(Object msg) {
             System.out.println("entityMessage : " + msg);
-            if (msg instanceof Location)
-                return msg;
-            else if (msg instanceof processPUBLISH || msg instanceof processSUBSCRIBE)
+            if (msg instanceof processPUBLISH || msg instanceof processSUBSCRIBE)
                 return msg;
             else
                 return msg;

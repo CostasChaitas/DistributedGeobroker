@@ -8,20 +8,14 @@ import org.jetbrains.annotations.NotNull;
 public class processSUBSCRIBE {
 
     public InternalServerMessage message;
-    public ActorRef clientActor;
+    public ActorRef wsClientActor;
     public int tileId;
 
     public processSUBSCRIBE(@NotNull @JsonProperty("message") InternalServerMessage message,
-                          @NotNull @JsonProperty("clientActor") ActorRef clientActor){
-        this.message = message;
-        this.clientActor = clientActor;
-    }
-
-    public processSUBSCRIBE(@NotNull @JsonProperty("message") InternalServerMessage message,
-                          @NotNull @JsonProperty("clientActor") ActorRef clientActor,
+                          @NotNull @JsonProperty("wsClientActor") ActorRef wsClientActor,
                           @NotNull @JsonProperty("tileId") int tileId){
         this.message = message;
-        this.clientActor = clientActor;
+        this.wsClientActor = wsClientActor;
         this.tileId = tileId;
     }
 }
