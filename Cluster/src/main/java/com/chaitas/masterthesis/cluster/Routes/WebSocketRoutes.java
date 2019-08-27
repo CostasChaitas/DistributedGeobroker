@@ -18,9 +18,7 @@ import com.chaitas.masterthesis.cluster.Actors.WsClientActor;
 import com.chaitas.masterthesis.cluster.Messages.OutgoingDestination;
 import com.chaitas.masterthesis.cluster.util.JSONable;
 import com.chaitas.masterthesis.commons.KryoSerializer;
-import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.InternalServerMessage;
-import com.chaitas.masterthesis.commons.payloads.INCOMPATIBLEPayload;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,17 +97,14 @@ public class WebSocketRoutes extends AllDirectives {
                         if (message0.isPresent()) {
                             InternalServerMessage message = message0.get();
                             System.out.println("The message has been successfully deserialized : " + message.getControlPacketType());
-
                             return new InternalServerMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
                             );
-
-
                         } else {
                             System.out.println("Received an incompatible text message: +" + msg);
-                            return new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload);
+                            return null;
                         }
                     } else{
                         // Message is Binary
@@ -127,7 +122,7 @@ public class WebSocketRoutes extends AllDirectives {
                             );
                         }else{
                             System.out.println("Received an incompatible binary message: +" + msg);
-                            return new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload);
+                            return null;
                         }
 
                     }

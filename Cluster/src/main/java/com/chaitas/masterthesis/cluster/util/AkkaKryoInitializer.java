@@ -7,12 +7,13 @@ import com.chaitas.masterthesis.commons.ControlPacketType;
 import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.InternalServerMessage;
 import com.chaitas.masterthesis.commons.message.Topic;
-import com.chaitas.masterthesis.commons.payloads.PUBLISHPayload;
-import com.chaitas.masterthesis.commons.payloads.SUBSCRIBEPayload;
+import com.chaitas.masterthesis.commons.payloads.*;
 import com.chaitas.masterthesis.commons.spatial.Geofence;
 import com.chaitas.masterthesis.commons.spatial.Location;
 import com.esotericsoftware.kryo.Kryo;
-
+import org.locationtech.spatial4j.context.jts.JtsSpatialContext;
+import org.locationtech.spatial4j.io.jts.JtsBinaryCodec;
+import org.locationtech.spatial4j.shape.impl.RectangleImpl;
 
 
 public class AkkaKryoInitializer {
@@ -33,7 +34,13 @@ public class AkkaKryoInitializer {
         kryo.register(InternalServerMessage.class, 267);
         kryo.register(PUBLISHPayload.class, 268);
         kryo.register(SUBSCRIBEPayload.class, 269);
-
+        kryo.register(CONNECTPayload.class, 270);
+        kryo.register(CONNACKPayload.class, 271);
+        kryo.register(PINGREQPayload.class, 272);
+        kryo.register(PINGRESPPayload.class, 273);
+        kryo.register(RectangleImpl.class, 274);
+        kryo.register(JtsSpatialContext.class, 275);
+        kryo.register(JtsBinaryCodec.class, 276);
     }
 
 }

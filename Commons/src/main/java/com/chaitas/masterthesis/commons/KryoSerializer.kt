@@ -31,15 +31,6 @@ class KryoSerializer {
                 return Topic(topic)
             }
         })
-        kryo.register(Topic::class.java, object : Serializer<Topic>() {
-            override fun write(kryo: Kryo, output: Output, o: Topic) {
-                kryo.writeObjectOrNull(output, o.topic, String::class.java)
-            }
-            override fun read(kryo: Kryo, input: Input, aClass: Class<Topic>): Topic? {
-                val topic = kryo.readObjectOrNull(input, String::class.java) ?: return null
-                return Topic(topic)
-            }
-        })
         kryo.register(Location::class.java, object : Serializer<Location>() {
             override fun write(kryo: Kryo, output: Output, o: Location) {
                 if (o.isUndefined) {
@@ -61,19 +52,6 @@ class KryoSerializer {
                 }
             }
         })
-//        kryo.register(Geofence::class.java, object : Serializer<Geofence>() {
-//            override fun write(kryo: Kryo, output: Output, o: Geofence) {
-//                kryo.writeObjectOrNull(output, o.location, Location::class.java)
-//                kryo.writeObjectOrNull(output, o.radiusDegree, Double::class.javaPrimitiveType)
-//            }
-//
-//            override fun read(kryo: Kryo, input: Input, aClass: Class<Geofence>): Geofence? {
-//                val location = kryo.readObjectOrNull(input, Location::class.java) ?: return null
-//                val radiusDegree = kryo.readObjectOrNull(input, Double::class.javaPrimitiveType!!) ?: return null
-//                return Geofence(location, radiusDegree)
-//            }
-//        })
-
         kryo.register(Geofence::class.java, object : Serializer<Geofence>() {
             override fun write(kryo: Kryo, output: Output, o: Geofence) {
                 kryo.writeObjectOrNull(output, o.wktString, String::class.java)
@@ -87,17 +65,6 @@ class KryoSerializer {
                     return null
                 }
 
-            }
-        })
-
-        kryo.register(Topic::class.java, object : Serializer<Topic>() {
-            override fun write(kryo: Kryo, output: Output, o: Topic) {
-                kryo.writeObjectOrNull(output, o.topic, String::class.java)
-            }
-
-            override fun read(kryo: Kryo, input: Input, aClass: Class<Topic>): Topic? {
-                val str = kryo.readObjectOrNull(input, String::class.java) ?: return null
-                return Topic(str)
             }
         })
         kryo.register(CONNACKPayload::class.java, object : Serializer<CONNACKPayload>() {
@@ -216,7 +183,6 @@ class KryoSerializer {
                 return UNSUBSCRIBEPayload(topic)
             }
         })
-
         kryo.register(InternalServerMessage::class.java, object : Serializer<InternalServerMessage>() {
             override fun write(kryo: Kryo, output: Output, o: InternalServerMessage) {
                 kryo.writeObjectOrNull(output, o.clientIdentifier, String::class.java)
@@ -240,8 +206,7 @@ class KryoSerializer {
                     ControlPacketType.SUBACK -> o = kryo.readObjectOrNull(input, SUBACKPayload::class.java) ?: return null
                     ControlPacketType.SUBSCRIBE -> o = kryo.readObjectOrNull(input, SUBSCRIBEPayload::class.java) ?: return null
                     ControlPacketType.UNSUBACK -> o = kryo.readObjectOrNull(input, UNSUBACKPayload::class.java) ?: return null
-                    ControlPacketType.UNSUBSCRIBE -> o =
-                            kryo.readObjectOrNull(input, UNSUBSCRIBEPayload::class.java) ?: return null
+                    ControlPacketType.UNSUBSCRIBE -> o = kryo.readObjectOrNull(input, UNSUBSCRIBEPayload::class.java) ?: return null
                     else -> return null
                 }
                 return InternalServerMessage(clientIdentifier, controlPacketType, o)

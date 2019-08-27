@@ -14,5 +14,4 @@ public enum ControlPacketType {
     UNSUBSCRIBE, //
     UNSUBACK, //
     NOTCONNECTED, //
-    INCOMPATIBLEPAYLOAD
 }

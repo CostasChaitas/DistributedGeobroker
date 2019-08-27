@@ -3,6 +3,7 @@ package com.chaitas.masterthesis.commons.spatial;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jetbrains.annotations.NotNull;
 import org.locationtech.spatial4j.io.ShapeWriter;
 import org.locationtech.spatial4j.shape.Circle;
 import org.locationtech.spatial4j.shape.Rectangle;
@@ -21,13 +22,13 @@ public class Geofence  {
     @JsonIgnore
     final Rectangle boundingBox;
 
+    @JsonIgnore
     private Geofence(Shape shape) {
         this.shape = shape;
         this.boundingBox = shape.getBoundingBox();
     }
 
-    @JsonCreator
-    public Geofence(@JsonProperty("WKT") String wkt) throws ParseException {
+    public Geofence(@NotNull @JsonProperty("WKT") String wkt) throws ParseException {
         WKTReader reader = (WKTReader) GEO.getFormats().getWktReader();
         this.shape = reader.parse(wkt);
         this.boundingBox = this.shape.getBoundingBox();
@@ -39,15 +40,18 @@ public class Geofence  {
         return new Geofence(c);
     }
 
+    @JsonIgnore
     public static Geofence world() {
         Shape worldShape = GEO.getWorldBounds();
         return new Geofence(worldShape);
     }
 
+    @JsonIgnore
     public boolean contains(Location location) {
         return shape.relate(location.getLocation()).equals(SpatialRelation.CONTAINS);
     }
 
+    @JsonIgnore
     public boolean intersects(Geofence geofence) {
         SpatialRelation sr = shape.relate(geofence.shape);
         return sr.equals(SpatialRelation.INTERSECTS) || sr.equals(SpatialRelation.CONTAINS) ||
@@ -74,7 +78,7 @@ public class Geofence  {
         return new Location(boundingBox.getMinY(), boundingBox.getMinX());
     }
 
-    @JsonProperty("WKT")
+    @JsonIgnore
     public String getWKTString() {
         ShapeWriter writer = GEO.getFormats().getWktWriter();
         return writer.toString(shape);

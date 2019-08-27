@@ -18,9 +18,7 @@ import org.jetbrains.annotations.Nullable;
         @JsonSubTypes.Type(value = SUBSCRIBEPayload.class, name = "SUBSCRIBEPayload"),
         @JsonSubTypes.Type(value = PUBLISHPayload.class, name = "PUBLISHPayload"),
         @JsonSubTypes.Type(value = SUBACKPayload.class, name = "SUBACKPayload"),
-        @JsonSubTypes.Type(value = PUBACKPayload.class, name = "PUBACKPayload"),
-        @JsonSubTypes.Type(value = INCOMPATIBLEPayload.class, name = "INCOMPATIBLEPayload"),
-
+        @JsonSubTypes.Type(value = PUBACKPayload.class, name = "PUBACKPayload")
 })
 public abstract class AbstractPayload {
 
@@ -90,10 +88,5 @@ public abstract class AbstractPayload {
         return this instanceof UNSUBACKPayload ? (UNSUBACKPayload)this : null;
     }
 
-    @JsonIgnore
-    @Nullable
-    public final INCOMPATIBLEPayload getINCOMPATIBLEPayload() {
-        return this instanceof INCOMPATIBLEPayload ? (INCOMPATIBLEPayload)this : null;
-    }
 
 }

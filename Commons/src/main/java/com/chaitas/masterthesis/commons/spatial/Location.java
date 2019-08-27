@@ -10,7 +10,9 @@ import org.locationtech.spatial4j.shape.Point;
 
 public class Location {
 
+    @JsonIgnore
     private final Point point;
+    @JsonIgnore
     public boolean undefined = false;
 
     public Location(@NotNull @JsonProperty("lat") double lat,

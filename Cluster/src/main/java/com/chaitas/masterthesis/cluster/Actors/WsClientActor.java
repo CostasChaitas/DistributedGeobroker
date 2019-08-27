@@ -50,14 +50,15 @@ public class WsClientActor extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
 
+                // Incoming from WS
                 .match(InternalServerMessage.class, message-> receiveInternalServerMessage(message))
+                .match(OutgoingDestination.class, message -> receiveOutgoingDestination(message))
 
+                // Incoming from Sharding Entity - TileManager
                 .match(SendSUBACK.class, message-> receiveSendSuback(message))
                 .match(SendPUBACK.class, message-> receiveSendPuback(message))
                 .match(GeoMatching.class, message-> receiveGeoMatching(message))
 
-                .match(INCOMPATIBLEPayload.class, message-> receiveIncompatiblePayload())
-                .match(OutgoingDestination.class, message -> receiveOutgoingDestination(message))
                 .build();
     }
 
@@ -189,7 +190,6 @@ public class WsClientActor extends AbstractActor {
                     break;
                 default:
                     log.info("Cannot process message +" + message.toString());
-                    receiveIncompatiblePayload();
         }
     }
 
@@ -255,17 +255,6 @@ public class WsClientActor extends AbstractActor {
         log.info("TileId's found :  " + randomNum);
 
         return 2;
-    }
-
-    private void receiveIncompatiblePayload() {
-        log.info("WsClientActor Actor received IncompatibleMessage ");
-        INCOMPATIBLEPayload incompatibleMessage = new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload);
-        InternalServerMessage internalServerMessage = new InternalServerMessage(
-                "",
-                ControlPacketType.INCOMPATIBLEPAYLOAD,
-                incompatibleMessage
-        );
-        outgoing.tell(internalServerMessage, getSender());
     }
 
     private void receiveOutgoingDestination(OutgoingDestination message) {
