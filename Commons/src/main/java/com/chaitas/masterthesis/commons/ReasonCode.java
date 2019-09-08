@@ -9,8 +9,8 @@ public enum ReasonCode {
     NoMatchingSubscribers, //
     NoSubscriptionExisted, //
 
-    IncompatiblePayload,
-
+    ConnectionAlreadyExist, //
+    IncompatiblePayload , //
     // New Reason Codes
     LocationUpdated, //
     WrongBroker, //

@@ -9,6 +9,7 @@
         <module name="Client" />
         <module name="Cluster" />
         <module name="Commons" />
+        <module name="spatial4j" />
       </profile>
     </annotationProcessing>
   </component>

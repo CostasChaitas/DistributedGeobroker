@@ -14,40 +14,45 @@ import akka.stream.javadsl.Flow;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import akka.util.ByteString;
-import com.chaitas.masterthesis.cluster.Actors.Frontend;
+import com.chaitas.masterthesis.cluster.Actors.WsClientActor;
 import com.chaitas.masterthesis.cluster.Messages.OutgoingDestination;
 import com.chaitas.masterthesis.cluster.util.JSONable;
+import com.chaitas.masterthesis.commons.ControlPacketType;
 import com.chaitas.masterthesis.commons.KryoSerializer;
-import com.chaitas.masterthesis.commons.message.InternalServerMessage;
+import com.chaitas.masterthesis.commons.ReasonCode;
+import com.chaitas.masterthesis.commons.message.ExternalMessage;
+import com.chaitas.masterthesis.commons.payloads.INCOMPATIBLEPayload;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class WebSocketRoutes extends AllDirectives {
+    public class WebSocketRoutes extends AllDirectives {
 
     private final ActorSystem system;
-    private final ActorRef shardRegion;
+    private final ActorRef tileShardRegion;
+    private final ActorRef clientShardRegion;
     private Map<String, ActorRef> connections = new HashMap<>();
     private KryoSerializer kryo = new KryoSerializer();
 
-    public WebSocketRoutes(ActorSystem system, ActorRef shardRegion) {
+    public WebSocketRoutes(ActorSystem system, ActorRef tileShardRegion, ActorRef clientShardRegion) {
         this.system = system;
-        this.shardRegion = shardRegion;
+        this.tileShardRegion = tileShardRegion;
+        this.clientShardRegion = clientShardRegion;
     }
 
     public Route createRoute() {
         return route(
                 path("test", () ->
                         get(() -> {
-                            System.out.println("WebSocket connection on route {test} has been initiated." );
+                            System.out.println("WsServerActor connection on route {/test} has been initiated." );
                             return complete("Test completed");
                         })
                 ),
-                path("pubsub", () ->
+                path("api", () ->
                         get(() -> {
-                            System.out.println("WebSocket connection on route {api/v1/pubsub} has been initiated." );
+                            System.out.println("WsServerActor connection on route {/api} has been initiated." );
                             Flow<Message, Message, NotUsed> flow = createFlowRoute();
                             return handleWebSocketMessages(flow);
                         })
@@ -67,73 +72,68 @@ public class WebSocketRoutes extends AllDirectives {
 
     private Flow<Message, Message, NotUsed> createWebSocketFlow(String connectionId) {
 
-        ActorRef frontendActor = system.actorOf(Props.create(Frontend.class, shardRegion));
+        ActorRef wsClientActor = system.actorOf(Props.create(WsClientActor.class, tileShardRegion, clientShardRegion));
 
-        connections.put(connectionId, frontendActor);
+        connections.put(connectionId, wsClientActor);
         System.out.println("Connection added: " + connections.size());
 
         // Outgoing  messages
-        Source<Message, NotUsed> source = Source.<InternalServerMessage>actorRef(5, OverflowStrategy.fail())
+        Source<Message, NotUsed> source = Source.<ExternalMessage>actorRef(5, OverflowStrategy.fail())
                 .map((outgoing) -> {
                     String json = JSONable.toJSON(outgoing);
                     return (Message) TextMessage.create(json);
                 })
                 .mapMaterializedValue(destinationRef -> {
-                    frontendActor.tell(new OutgoingDestination(destinationRef), ActorRef.noSender());
+                    wsClientActor.tell(new OutgoingDestination(destinationRef), ActorRef.noSender());
                     return NotUsed.getInstance();
                 });
 
         // Incoming messages
         Sink<Message, NotUsed> sink = Flow.<Message>create()
                 .map((msg) -> {
-
                     // Message is Text
                     if(msg.isText()){
-
                         System.out.print("Received a text message");
-
-                        Optional<InternalServerMessage> message0 = JSONable.fromJSON(msg.asTextMessage().getStrictText(), InternalServerMessage.class);
-
+                        Optional<ExternalMessage> message0 = JSONable.fromJSON(msg.asTextMessage().getStrictText(), ExternalMessage.class);
                         if (message0.isPresent()) {
-                            InternalServerMessage message = message0.get();
+                            ExternalMessage message = message0.get();
                             System.out.println("The message has been successfully deserialized : " + message.getControlPacketType());
-
-                            return new InternalServerMessage(
+                            return new ExternalMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
                             );
-
-
                         } else {
-                            System.out.println("Received an incompatible text message: +" + msg);
-                            //return new BADPayload("Incompatible Payload", ReasonCode.IncompatiblePayload, "MAKE THE CLIENT ID INTERNAL!!");
-                            return null;
+                            System.out.println("Received an incompatible Text Message: +" + msg);
+                            return new ExternalMessage(
+                                    "404",
+                                    ControlPacketType.INCOMPATIBLEPayload,
+                                    new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload)
+                            );
                         }
                     } else{
                         // Message is Binary
                         ByteString msg1 = msg.asBinaryMessage().getStrictData();
                         byte[] arr = msg1.toArray();
                         System.out.print("Received a binary message");
-
-                        InternalServerMessage message = kryo.read(arr, InternalServerMessage.class);
-
+                        ExternalMessage message = kryo.read(arr, ExternalMessage.class);
                         if(message.getPayload() != null ) {
-                            return new InternalServerMessage(
+                            return new ExternalMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
                             );
                         }else{
-                            System.out.println("Received an incompatible binary message: +" + msg);
-                            //return new BADPayload("Incompatible Payload", ReasonCode.IncompatiblePayload, "MAKE THE CLIENT ID INTERNAL!!");
-                            return null;
+                            System.out.println("Received an incompatible Binary Message: +" + msg);
+                            return new ExternalMessage(
+                                    "404",
+                                    ControlPacketType.INCOMPATIBLEPayload,
+                                    new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload)
+                            );
                         }
-
                     }
-
                 })
-                .to(Sink.actorRef(frontendActor, PoisonPill.getInstance() ));
+                .to(Sink.actorRef(wsClientActor, PoisonPill.getInstance() ));
 
         return Flow.fromSinkAndSource(sink, source);
     }
