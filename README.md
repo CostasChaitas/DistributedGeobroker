@@ -1,6 +1,6 @@
 # MasterThesis
 
-## Title: Design and Implementation of a Scalable, Distributed, spatial.Location-Based Pub/Sub System
+## Title: Design and Implementation of a Scalable, Distributed, Location-Based Pub/Sub System
 
 This project/research is based on the [Geobroker project](https://github.com/MoeweX/geobroker) from Jonathan Hasenburg.
 
