@@ -17,6 +17,7 @@ public class Topic {
         this.levelSpecifiers = topic.split(TOPIC_LEVEL_SEPARATOR);
     }
 
+    @JsonIgnore
     public String getLevelSpecifier(int levelIndex) {
         if (levelIndex >= getNumberOfLevels()) {
             throw new RuntimeException(
@@ -28,6 +29,7 @@ public class Topic {
     /**
      * @return the number of available levels
      */
+    @JsonIgnore
     public int getNumberOfLevels() {
         return levelSpecifiers.length;
     }
@@ -37,6 +39,7 @@ public class Topic {
         return topic;
     }
 
+    @JsonIgnore
     public String[] getLevelSpecifiers() {
         return levelSpecifiers;
     }

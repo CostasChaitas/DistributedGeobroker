@@ -1,8 +1,7 @@
 package com.chaitas.masterthesis.cluster.Sharding;
 
-import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
-import akka.actor.Address;
+import akka.actor.*;
+import akka.cluster.sharding.ClusterSharding;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
@@ -23,6 +22,8 @@ public class ClientShardEntity extends AbstractActor {
     private final Address actorSystemAddress = getContext().system().provider().getDefaultAddress();
     private LoggingAdapter log = Logging.getLogger(getContext().system(), getSelf().path().toStringWithAddress(actorSystemAddress));
 
+    private ActorSystem actorSystem = getContext().getSystem();
+    private ActorRef topicShardRegion = ClusterSharding.get(actorSystem).shardRegion("Topics");
     private String clientShardEntityId;
     private Location clientLocation;
     private ActorRef wsClientActor;
@@ -61,7 +62,7 @@ public class ClientShardEntity extends AbstractActor {
                 ProcessSUBSCRIBE newSub = sub.getValue();
                 newSub.wsClientActor = sender();
                 log.info( "Telling TopicShardRegion to update user connections");
-                processCONNECT.topicShardRegion.tell(newSub, getSelf());
+                topicShardRegion.tell(newSub, getSelf());
             }
         }
 
@@ -262,21 +263,14 @@ public class ClientShardEntity extends AbstractActor {
                     ControlPacketType.MATCH,
                     publisherGeoMatching.publication.message.getPayload().getPUBLISHPayload()
             );
-            log.info("Sending PUBLISH message to " + wsClientActor);
-
+            log.info("Sending MATCH message to " + wsClientActor);
             wsClientActor.tell(externalMessage, getSelf());
         }
     }
 
     private Boolean publisherGeoMatching(ProcessPUBLISH publication){
-
-        log.info("Message geofence" + publication.message.getPayload().getPUBLISHPayload().geofence);
-        log.info("Client Location" + clientLocation);
-        log.info("MATCH : " + publication.message.getPayload().getPUBLISHPayload().geofence.contains(clientLocation));
-
         // Match message geofence & subscriber location.
         if(publication.message.getPayload().getPUBLISHPayload().geofence.contains(clientLocation)){
-            log.info("Sending PUBLISH message to " + wsClientActor);
             return true;
         }
         return false;

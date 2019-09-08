@@ -3,6 +3,7 @@ package com.chaitas.masterthesis.cluster.util;
 import akka.actor.ActorRef;
 import akka.actor.FunctionRef;
 import com.chaitas.masterthesis.cluster.Messages.*;
+import com.chaitas.masterthesis.cluster.Storage.Subscription;
 import com.chaitas.masterthesis.commons.ControlPacketType;
 import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.ExternalMessage;
@@ -93,8 +94,9 @@ public class AkkaKryoInitializer {
         kryo.register(ProcessUNSUBSCRIBE.class, 273);
         kryo.register(ProcessSUBSCRIBE.class, 274);
         kryo.register(ProcessPUBLISH.class, 275);
-        kryo.register(SendACK.class, 276);
-        kryo.register(PublisherGeoMatching.class, 277);
+        kryo.register(Subscription.class, 276);
+        kryo.register(SendACK.class, 277);
+        kryo.register(PublisherGeoMatching.class, 278);
 
     }
 

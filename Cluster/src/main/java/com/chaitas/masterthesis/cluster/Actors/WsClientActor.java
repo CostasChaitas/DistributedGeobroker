@@ -64,7 +64,7 @@ public class WsClientActor extends AbstractActor {
                     CONNECTPayload connectPayload = message.getPayload().getCONNECTPayload();
                     if (connectPayload != null) {
                         log.info("Message CONNECTPayload received :" + connectPayload.location);
-                        ProcessCONNECT processCONNECT = new ProcessCONNECT(message, getSelf(), topicShardRegion);
+                        ProcessCONNECT processCONNECT = new ProcessCONNECT(message, getSelf());
                         // Ask clientShardRegion Entity
                         clientShardRegion.tell(processCONNECT, getSelf());
                     }

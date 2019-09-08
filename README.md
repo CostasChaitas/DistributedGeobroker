@@ -50,13 +50,11 @@ mvn exec:java -Dexec.mainClass=Main -Dexec.args="2553 8082" -pl Cluster
 
 
 ## Measuring requests per second
-You can test both applications on your local machine by using:
+In order to distribute the load between the servers/nodes, a load balancer can be userd :
 
 * haproxy - fast and reliable http reverse proxy and load balancer,
 
-Akka configuration is capped so that we can simulate different conditions on commodity laptop.
-
-For benchmarking sharded application you need to use haproxy. Simple configuration for haproxy daemon can be found in resources dir. Run it with: 
+Simple configuration for haproxy daemon can be found in resources dir. Run it with: 
 ``` haproxy -f src/main/resources/haproxy.conf ```
 
 This will set up a round-robing load balancer with frontend on port 8000 and backends on 8080, 8081 and 8082.

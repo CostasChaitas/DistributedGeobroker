@@ -9,13 +9,10 @@ public class ProcessCONNECT {
 
     public ExternalMessage message;
     public ActorRef wsClientActor;
-    public ActorRef topicShardRegion;
 
     public ProcessCONNECT(@NotNull @JsonProperty("message") ExternalMessage message,
-                          @NotNull @JsonProperty("wsClientActor") ActorRef wsClientActor,
-                          @NotNull @JsonProperty("topicShardRegion") ActorRef topicShardRegion){
+                          @NotNull @JsonProperty("wsClientActor") ActorRef wsClientActor){
         this.message = message;
         this.wsClientActor = wsClientActor;
-        this.topicShardRegion = topicShardRegion;
     }
 }
