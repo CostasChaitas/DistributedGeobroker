@@ -3,10 +3,11 @@ package com.chaitas.masterthesis.cluster.Sharding;
 import akka.cluster.sharding.ShardRegion;
 import com.chaitas.masterthesis.cluster.Messages.*;
 
-
 public class TopicMessageExtractor {
 
-    public static final ShardRegion.MessageExtractor MESSAGE_EXTRACTOR = new ShardRegion.HashCodeMessageExtractor(100) {
+    private final static Integer maxNumberOfShards = 100;
+
+    public static final ShardRegion.MessageExtractor MESSAGE_EXTRACTOR = new ShardRegion.HashCodeMessageExtractor(maxNumberOfShards) {
 
         // This method will map an incoming message to an entity identifier
         @Override

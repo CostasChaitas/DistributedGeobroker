@@ -3,30 +3,22 @@ package com.chaitas.masterthesis.cluster.Actors;
 import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.pattern.Patterns;
-import akka.util.Timeout;
 import com.chaitas.masterthesis.cluster.Messages.*;
 import com.chaitas.masterthesis.commons.ControlPacketType;
 import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.ExternalMessage;
 import com.chaitas.masterthesis.commons.payloads.*;
-import scala.concurrent.Await;
-import scala.concurrent.Future;
-
-import java.time.Duration;
 
 public class WsClientActor extends AbstractActor {
 
     private final Address actorSystemAddress = getContext().system().provider().getDefaultAddress();
     private LoggingAdapter log = Logging.getLogger(getContext().system(), getSelf().path().toStringWithAddress(actorSystemAddress));
 
+    private final ActorRef clientShardRegion;
     private String wsClientActorId;
     private ActorRef outgoing;
-    private final ActorRef topicShardRegion;
-    private final ActorRef clientShardRegion;
 
-    public WsClientActor(ActorRef topicShardRegion, ActorRef clientShardRegion) {
-        this.topicShardRegion = topicShardRegion;
+    public WsClientActor(ActorRef clientShardRegion) {
         this.clientShardRegion = clientShardRegion;
     }
 
@@ -49,10 +41,8 @@ public class WsClientActor extends AbstractActor {
             // Incoming from WS
             .match(ExternalMessage.class, message-> receiveExternalMessage(message))
             .match(OutgoingDestination.class, message -> receiveOutgoingDestination(message))
-
             // Incoming from Sharding Entity - ClientShardEntity
             .match(SendACK.class, message-> receiveSendACK(message))
-
             .build();
     }
 
@@ -94,70 +84,27 @@ public class WsClientActor extends AbstractActor {
                     SUBSCRIBEPayload subscribePayload = message.getPayload().getSUBSCRIBEPayload();
                     if (subscribePayload != null) {
                         log.info("WsClientActor Actor: Message SUBSCRIBE received :");
-                        try{
-                            Timeout timeout = Timeout.create(Duration.ofSeconds(2));
-                            ProcessSUBSCRIBE processSUBSCRIBE = new ProcessSUBSCRIBE(message, getSelf());
-                            Future<Object> future = Patterns.ask(clientShardRegion, processSUBSCRIBE, timeout);
-                            SendACK sendACK = (SendACK) Await.result(future, timeout.duration());
-                            // Check if Client is Connected or the connection already exists
-                            if(sendACK.message.getControlPacketType() == ControlPacketType.NOTCONNECTED | sendACK.message.getControlPacketType() == ControlPacketType.CONNECTIONEXIST){
-                                outgoing.tell(sendACK.message, getSender());
-                                return;
-                            }
-                            outgoing.tell(sendACK.message, getSelf());
-                            // Ask TileShardEntity Entity
-                            topicShardRegion.tell(processSUBSCRIBE, getSelf());
-                        }catch(Exception e){
-                            log.info("Exception :" + e);
-                        }
-
+                        ProcessSUBSCRIBE processSUBSCRIBE = new ProcessSUBSCRIBE(message, getSelf());
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processSUBSCRIBE, getSelf());
                     }
                     break;
                 case UNSUBSCRIBE:
                     UNSUBSCRIBEPayload unsubscribePayload = message.getPayload().getUNSUBSCRIBEPayload();
                     if (unsubscribePayload != null) {
                         log.info("WsClientActor Actor: Message UNSUBSCRIBE received :");
-                        try{
-                            Timeout timeout = Timeout.create(Duration.ofSeconds(2));
-                            ProcessUNSUBSCRIBE processUNSUBSCRIBE = new ProcessUNSUBSCRIBE(message, getSelf());
-                            Future<Object> future = Patterns.ask(clientShardRegion, processUNSUBSCRIBE, timeout);
-                            SendACK sendACK = (SendACK) Await.result(future, timeout.duration());
-                            // Check if Client is Connected or the connection already exists
-                            if(sendACK.message.getControlPacketType() == ControlPacketType.NOTCONNECTED | sendACK.message.getControlPacketType() == ControlPacketType.CONNECTIONEXIST){
-                                outgoing.tell(sendACK.message, getSender());
-                                return;
-                            }
-                            outgoing.tell(sendACK.message, getSelf());
-
-                            // Ask TileShardEntity Entity
-                            topicShardRegion.tell(processUNSUBSCRIBE, getSelf());
-                        }catch(Exception e){
-                            log.info("Exception :" + e);
-                        }
+                        ProcessUNSUBSCRIBE processUNSUBSCRIBE = new ProcessUNSUBSCRIBE(message, getSelf());
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processUNSUBSCRIBE, getSelf());
                     }
                     break;
                 case PUBLISH:
                     PUBLISHPayload publishPayload = message.getPayload().getPUBLISHPayload();
                     if (publishPayload != null) {
                         log.info("WsClientActor Actor: Message PUBLISH received :");
-                        try{
-                            Timeout timeout = Timeout.create(Duration.ofSeconds(2));
-                            ProcessPUBLISH processPUBLISH = new ProcessPUBLISH(message, getSelf(), null);
-                            Future<Object> future = Patterns.ask(clientShardRegion, processPUBLISH, timeout);
-                            SendACK sendACK = (SendACK) Await.result(future, timeout.duration());
-                            // Check if Client is Connected or the connection already exists
-                            if(sendACK.message.getControlPacketType() == ControlPacketType.NOTCONNECTED | sendACK.message.getControlPacketType() == ControlPacketType.CONNECTIONEXIST){
-                                outgoing.tell(sendACK.message, getSender());
-                                return;
-                            }
-                            outgoing.tell(sendACK.message, getSelf());
-
-                            ProcessPUBLISH processPUBLISH1 = new ProcessPUBLISH(message, getSelf(), sendACK.clientLocation);
-                            // Ask TileShardEntity Entity
-                            topicShardRegion.tell(processPUBLISH1, getSelf());
-                        }catch(Exception e){
-                            log.info("Exception :" + e);
-                        }
+                        ProcessPUBLISH processPUBLISH = new ProcessPUBLISH(message, getSelf(), null);
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processPUBLISH, getSelf());
                     }
                     break;
                 case MATCH:
@@ -178,12 +125,10 @@ public class WsClientActor extends AbstractActor {
         }
     }
 
-
     private void receiveSendACK(SendACK sendACK) {
         log.info("WsClientActor Actor: Message SendACK received" );
         outgoing.tell(sendACK.message, getSender());
     }
-
 
     private void receiveOutgoingDestination(OutgoingDestination message) {
         log.info("WsClientActor Actors received OutgoingDestination msg : {}", message.destination);

@@ -28,12 +28,12 @@ public class WsServerActor extends AbstractActor {
     private final CompletionStage<ServerBinding> binding; // The HttpServerActor server binding
     private String webSocketActorId;
 
-    public WsServerActor(ActorRef topicShardRegion, ActorRef clientShardRegion) {
+    public WsServerActor(ActorRef clientShardRegion) {
 
         // Set up TCP WsServerActor Server
         final Materializer materializer = ActorMaterializer.create(system);
 
-        WebSocketRoutes routes = new WebSocketRoutes(system, topicShardRegion, clientShardRegion);
+        WebSocketRoutes routes = new WebSocketRoutes(system, clientShardRegion);
 
         Config config = system.settings().config();
         String hostname = config.getString("api.http.hostname");

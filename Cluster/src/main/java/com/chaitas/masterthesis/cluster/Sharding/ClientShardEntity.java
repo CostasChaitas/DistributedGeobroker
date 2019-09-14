@@ -22,8 +22,8 @@ public class ClientShardEntity extends AbstractActor {
     private final Address actorSystemAddress = getContext().system().provider().getDefaultAddress();
     private LoggingAdapter log = Logging.getLogger(getContext().system(), getSelf().path().toStringWithAddress(actorSystemAddress));
 
-    private ActorSystem actorSystem = getContext().getSystem();
-    private ActorRef topicShardRegion = ClusterSharding.get(actorSystem).shardRegion("Topics");
+    private final ActorSystem actorSystem = getContext().getSystem();
+    private final ActorRef topicShardRegion = ClusterSharding.get(actorSystem).shardRegion("Topics");
     private String clientShardEntityId;
     private Location clientLocation;
     private ActorRef wsClientActor;
@@ -47,7 +47,6 @@ public class ClientShardEntity extends AbstractActor {
             .match(ProcessUNSUBSCRIBE.class, message-> receiveProcessUNSUBSCRIBE(message))
             .match(ProcessSUBSCRIBE.class, message-> receiveProcessSUBSCRIBE(message))
             .match(ProcessPUBLISH.class, message-> receiveProcessPUBLISH(message))
-
             // Incoming from Sharding Entity - TileShardEntity
             .match(PublisherGeoMatching.class, message-> receivePublisherGeoMatching(message))
             .build();
@@ -166,6 +165,9 @@ public class ClientShardEntity extends AbstractActor {
         );
         SendACK sendACK = new SendACK(UNSUBACK, clientLocation);
         sender().tell(sendACK, getSender());
+
+        // Ask TileShardEntity Entity
+        topicShardRegion.tell(processUNSUBSCRIBE, getSelf());
     }
 
     private void receiveProcessSUBSCRIBE(ProcessSUBSCRIBE processSUBSCRIBE) {
@@ -209,9 +211,11 @@ public class ClientShardEntity extends AbstractActor {
                 ControlPacketType.SUBACK,
                 subackPayload
         );
-        log.info("SENDING ACK :");
         SendACK sendACK = new SendACK(SUBACK, clientLocation);
         sender().tell(sendACK, getSelf());
+
+        // Ask TileShardEntity Entity
+        topicShardRegion.tell(processSUBSCRIBE, getSelf());
     }
 
     private void receiveProcessPUBLISH(ProcessPUBLISH processPUBLISH) {
@@ -249,12 +253,15 @@ public class ClientShardEntity extends AbstractActor {
         );
         SendACK sendACK = new SendACK(PUBACK, clientLocation);
         sender().tell(sendACK, getSelf());
+
+        // Ask TileShardEntity Entity
+        processPUBLISH.clientLocation = clientLocation;
+        topicShardRegion.tell(processPUBLISH, getSelf());
     }
 
 
     private void receivePublisherGeoMatching(PublisherGeoMatching publisherGeoMatching){
         log.info("Doing the PublisherGeoMatching for " + clientShardEntityId);
-
         // Publisher geo matching
         Boolean isPublisherGeoMatching = publisherGeoMatching(publisherGeoMatching.publication);
         if(isPublisherGeoMatching){

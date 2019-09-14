@@ -23,22 +23,16 @@ import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.ExternalMessage;
 import com.chaitas.masterthesis.commons.payloads.INCOMPATIBLEPayload;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
     public class WebSocketRoutes extends AllDirectives {
 
     private final ActorSystem system;
-    private final ActorRef tileShardRegion;
     private final ActorRef clientShardRegion;
-    private Map<String, ActorRef> connections = new HashMap<>();
     private KryoSerializer kryo = new KryoSerializer();
 
-    public WebSocketRoutes(ActorSystem system, ActorRef tileShardRegion, ActorRef clientShardRegion) {
+    public WebSocketRoutes(ActorSystem system, ActorRef clientShardRegion) {
         this.system = system;
-        this.tileShardRegion = tileShardRegion;
         this.clientShardRegion = clientShardRegion;
     }
 
@@ -61,23 +55,17 @@ import java.util.UUID;
     }
 
     private <T> Flow<Message, Message, NotUsed> createFlowRoute(){
-        final String connectionId = UUID.randomUUID().toString();
-        final Flow<Message, Message, NotUsed> flow = createWebSocketFlow(connectionId).watchTermination((nu, cd) -> {
-            cd.whenComplete((done, throwable) -> connections.remove(connectionId));
-            return nu;
-        });
+        final Flow<Message, Message, NotUsed> flow = createWebSocketFlow().watchTermination((nu, cd) -> nu);
         return flow;
     }
 
+    private Flow<Message, Message, NotUsed> createWebSocketFlow() {
 
-    private Flow<Message, Message, NotUsed> createWebSocketFlow(String connectionId) {
+        ActorRef wsClientActor = system.actorOf(Props.create(WsClientActor.class, clientShardRegion));
 
-        ActorRef wsClientActor = system.actorOf(Props.create(WsClientActor.class, tileShardRegion, clientShardRegion));
+        System.out.println("TCP Connection opened");
 
-        connections.put(connectionId, wsClientActor);
-        System.out.println("Connection added: " + connections.size());
-
-        // Outgoing  messages
+        // Outgoing messages
         Source<Message, NotUsed> source = Source.<ExternalMessage>actorRef(5, OverflowStrategy.fail())
                 .map((outgoing) -> {
                     String json = JSONable.toJSON(outgoing);
@@ -97,7 +85,6 @@ import java.util.UUID;
                         Optional<ExternalMessage> message0 = JSONable.fromJSON(msg.asTextMessage().getStrictText(), ExternalMessage.class);
                         if (message0.isPresent()) {
                             ExternalMessage message = message0.get();
-                            System.out.println("The message has been successfully deserialized : " + message.getControlPacketType());
                             return new ExternalMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
@@ -137,7 +124,6 @@ import java.util.UUID;
 
         return Flow.fromSinkAndSource(sink, source);
     }
-
 
 }
 

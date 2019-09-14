@@ -52,14 +52,14 @@ public class Main {
                 settings,
                 ClientMessageExtractor.MESSAGE_EXTRACTOR
         );
-        ActorRef topicShardRegion = ClusterSharding.get(system).start(
+        ClusterSharding.get(system).start(
                 "Topics",
                 Props.create(TopicShardEntity.class, clientShardRegion),
                 settings,
                 TopicMessageExtractor.MESSAGE_EXTRACTOR
         );
         // Create an actor that starts the TCP Websocket Server
-        system.actorOf(Props.create(WsServerActor.class, topicShardRegion, clientShardRegion));
+        system.actorOf(Props.create(WsServerActor.class, clientShardRegion));
     }
 
 }
