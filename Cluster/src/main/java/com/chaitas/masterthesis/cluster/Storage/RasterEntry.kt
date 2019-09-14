@@ -46,7 +46,8 @@ class RasterEntry(val index: Location, degreeStep: Double) {
      * @return the number of subscriptionIds stored in the [RasterEntry] after the operation completed
      */
     fun putSubscriptionId(subscriptionId: ImmutablePair<String, String>): Int {
-        existingSubscriptionIds.getOrPut(subscriptionId.left) { ConcurrentHashMap.newKeySet() }.add(subscriptionId)
+        existingSubscriptionIds.getOrPut(subscriptionId.left) { ConcurrentHashMap.newKeySet() }
+        existingSubscriptionIds[subscriptionId.left] = mutableSetOf( subscriptionId)
         return numSubscriptionIds.incrementAndGet()
     }
 

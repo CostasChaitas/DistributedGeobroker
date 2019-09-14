@@ -61,7 +61,6 @@ class Raster(val granularity: Int) {
         // get all RasterEntries to which the id should be added
         val viableRasterEntries = calculateIndexLocations(geofence)
 
-        System.out.println("viableRasterEntries size" + viableRasterEntries.size)
         // add the subscriptionId to the RasterEntries
         for (viableRasterEntry in viableRasterEntries) {
             viableRasterEntry.putSubscriptionId(subscriptionId)
