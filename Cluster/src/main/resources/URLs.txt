@@ -1,5 +1,0 @@
-http://127.0.0.1:8000/customer/10/address
-http://127.0.0.1:8000/customer/500/address
-http://127.0.0.1:8000/customer/10000/address
-http://127.0.0.1:8000/customer/5000000/address
-http://127.0.0.1:8000/customer/10000000/address
