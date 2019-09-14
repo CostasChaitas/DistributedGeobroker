@@ -6,15 +6,19 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
 import com.chaitas.masterthesis.cluster.Messages.*;
+import com.chaitas.masterthesis.cluster.Storage.Subscription;
 import com.chaitas.masterthesis.commons.ControlPacketType;
 import com.chaitas.masterthesis.commons.ReasonCode;
 import com.chaitas.masterthesis.commons.message.ExternalMessage;
 import com.chaitas.masterthesis.commons.message.Topic;
 import com.chaitas.masterthesis.commons.payloads.*;
+import com.chaitas.masterthesis.commons.spatial.Geofence;
 import com.chaitas.masterthesis.commons.spatial.Location;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientShardEntity extends AbstractActor {
@@ -27,7 +31,7 @@ public class ClientShardEntity extends AbstractActor {
     private String clientShardEntityId;
     private Location clientLocation;
     private ActorRef wsClientActor;
-    private Map<Topic, ProcessSUBSCRIBE> subscriptions = new ConcurrentHashMap<>();
+    private Map<Topic, Subscription> subscriptions = new ConcurrentHashMap<>();
 
     @Override
     public void preStart() throws Exception {
@@ -54,21 +58,21 @@ public class ClientShardEntity extends AbstractActor {
 
     private void receiveProcessCONNECT(ProcessCONNECT processCONNECT) {
         log.info("Message ProcessCONNECT received ");
-
         // Check if it's needed to update clientActor
         if(clientLocation != null){
-            for (Map.Entry<Topic, ProcessSUBSCRIBE> sub : subscriptions.entrySet()) {
-                ProcessSUBSCRIBE newSub = sub.getValue();
-                newSub.wsClientActor = sender();
+            for (Map.Entry<Topic, Subscription> sub : subscriptions.entrySet()) {
+                Subscription newSub = sub.getValue();
+                newSub.setWsClientActor(sender());
                 log.info( "Telling TopicShardRegion to update user connections");
                 topicShardRegion.tell(newSub, getSelf());
             }
         }
-
         // Connect ClientShardEntity and update the location
         clientLocation = processCONNECT.message.getPayload().getCONNECTPayload().location;
         log.info( "wsClientActor" + wsClientActor);
         wsClientActor = processCONNECT.wsClientActor;
+
+        // Sending ACK
         CONNACKPayload connackPayload = new CONNACKPayload(ReasonCode.Success);
         ExternalMessage CONNACK = new ExternalMessage(
                 processCONNECT.message.getClientIdentifier(),
@@ -115,6 +119,7 @@ public class ClientShardEntity extends AbstractActor {
         // Update location
         clientLocation = processPINGREQ.message.getPayload().getPINGREQPayload().location;
 
+        // Sending ACK
         PINGRESPPayload pingrespPayload = new PINGRESPPayload(ReasonCode.Success);
         ExternalMessage PINGRESP = new ExternalMessage(
                 processPINGREQ.message.getClientIdentifier(),
@@ -155,19 +160,18 @@ public class ClientShardEntity extends AbstractActor {
 
         // Unsubscribe
         subscriptions.remove(processUNSUBSCRIBE.message.getPayload().getUNSUBSCRIBEPayload().topic);
+        // Ask TileShardEntity Entity
+        topicShardRegion.tell(processUNSUBSCRIBE, getSelf());
 
-        // Update location
+        // Sending ACK
         UNSUBACKPayload unsubackPayload = new UNSUBACKPayload(ReasonCode.Success);
         ExternalMessage UNSUBACK = new ExternalMessage(
                 processUNSUBSCRIBE.message.getClientIdentifier(),
                 ControlPacketType.UNSUBACK,
                 unsubackPayload
         );
-        SendACK sendACK = new SendACK(UNSUBACK, clientLocation);
+        SendACK sendACK = new SendACK(UNSUBACK);
         sender().tell(sendACK, getSender());
-
-        // Ask TileShardEntity Entity
-        topicShardRegion.tell(processUNSUBSCRIBE, getSelf());
     }
 
     private void receiveProcessSUBSCRIBE(ProcessSUBSCRIBE processSUBSCRIBE) {
@@ -198,24 +202,33 @@ public class ClientShardEntity extends AbstractActor {
             sender().tell(sendACK, getSender());
             return;
         }
+        // Creating Subscription
+        String clientId = processSUBSCRIBE.message.getClientIdentifier();
+        String subId = UUID.randomUUID().toString();
+        ImmutablePair<String, String> subscriptionId = new ImmutablePair(clientId, subId);
+        Topic topic = processSUBSCRIBE.message.getPayload().getSUBSCRIBEPayload().topic;
+        Geofence geofence = processSUBSCRIBE.message.getPayload().getSUBSCRIBEPayload().geofence;
+        ActorRef wsClientActor = processSUBSCRIBE.wsClientActor;
+        Subscription subscription = new Subscription(subscriptionId, topic, geofence, wsClientActor);
 
         // Register subscription for the client
-        Topic topic = processSUBSCRIBE.message.getPayload().getSUBSCRIBEPayload().topic;
-        subscriptions.put(topic, processSUBSCRIBE);
+        subscriptions.put(topic, subscription);
 
         log.info("There are  : " + subscriptions.size() + " subs for client "  + processSUBSCRIBE.message.getClientIdentifier());
 
+        // Ask TileShardEntity Entity
+        processSUBSCRIBE.subscription = subscription;
+        topicShardRegion.tell(processSUBSCRIBE, getSelf());
+
+        // Sending ACK
         SUBACKPayload subackPayload = new SUBACKPayload(ReasonCode.Success);
         ExternalMessage SUBACK = new ExternalMessage(
                 processSUBSCRIBE.message.getClientIdentifier(),
                 ControlPacketType.SUBACK,
                 subackPayload
         );
-        SendACK sendACK = new SendACK(SUBACK, clientLocation);
+        SendACK sendACK = new SendACK(SUBACK);
         sender().tell(sendACK, getSelf());
-
-        // Ask TileShardEntity Entity
-        topicShardRegion.tell(processSUBSCRIBE, getSelf());
     }
 
     private void receiveProcessPUBLISH(ProcessPUBLISH processPUBLISH) {
@@ -245,18 +258,19 @@ public class ClientShardEntity extends AbstractActor {
             sender().tell(sendACK, getSender());
             return;
         }
+        // Ask TileShardEntity Entity
+        processPUBLISH.clientLocation = clientLocation;
+        topicShardRegion.tell(processPUBLISH, getSelf());
+
+        // Sending ACK
         PUBACKPayload pubackPayload = new PUBACKPayload(ReasonCode.Success);
         ExternalMessage PUBACK = new ExternalMessage(
                 processPUBLISH.message.getClientIdentifier(),
                 ControlPacketType.PUBACK,
                 pubackPayload
         );
-        SendACK sendACK = new SendACK(PUBACK, clientLocation);
+        SendACK sendACK = new SendACK(PUBACK);
         sender().tell(sendACK, getSelf());
-
-        // Ask TileShardEntity Entity
-        processPUBLISH.clientLocation = clientLocation;
-        topicShardRegion.tell(processPUBLISH, getSelf());
     }
 
 

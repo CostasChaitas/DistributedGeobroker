@@ -15,7 +15,7 @@ public class TopicMessageExtractor {
             if (msg instanceof ProcessUNSUBSCRIBE) {
                 return String.valueOf(((ProcessUNSUBSCRIBE) msg).message.getPayload().getUNSUBSCRIBEPayload().topic.getTopic());
             }else if (msg instanceof ProcessSUBSCRIBE) {
-                return String.valueOf(((ProcessSUBSCRIBE) msg).message.getPayload().getSUBSCRIBEPayload().topic.getTopic());
+                return String.valueOf(((ProcessSUBSCRIBE) msg).subscription.getTopic());
             }else if (msg instanceof ProcessPUBLISH) {
                 return String.valueOf(((ProcessPUBLISH) msg).message.getPayload().getPUBLISHPayload().topic.getTopic());
             } else {

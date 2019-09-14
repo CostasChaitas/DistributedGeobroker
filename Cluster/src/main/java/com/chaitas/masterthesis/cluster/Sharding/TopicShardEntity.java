@@ -9,14 +9,11 @@ import akka.event.LoggingAdapter;
 import com.chaitas.masterthesis.cluster.Messages.*;
 import com.chaitas.masterthesis.cluster.Storage.Raster;
 import com.chaitas.masterthesis.cluster.Storage.Subscription;
-import com.chaitas.masterthesis.commons.message.Topic;
-import com.chaitas.masterthesis.commons.spatial.Geofence;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -57,45 +54,30 @@ public class TopicShardEntity extends AbstractActor {
         log.info("TopicShardEntity actor received ProcessUNSUBSCRIBE " + topicShardId);
         // Unsubscribe
         String clientId = processUNSUBSCRIBE.message.getClientIdentifier();
-
         Subscription subscription = subscriptions.get(processUNSUBSCRIBE.message.getClientIdentifier());
-
         ImmutablePair subscriptionId = new ImmutablePair(clientId, subscription.getSubscriptionId().getRight());
-
         raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscriptionId);
     }
 
     private void receiveProcessSUBSCRIBE(ProcessSUBSCRIBE processSUBSCRIBE){
         log.info("TopicShardEntity actor received ProcessSUBSCRIBE " + topicShardId);
-
         // Register subscription for the client
-        String clientId = processSUBSCRIBE.message.getClientIdentifier();
-        String subId = UUID.randomUUID().toString();
-        ImmutablePair<String, String> subscriptionId = new ImmutablePair(clientId, subId);
-        Topic topic = processSUBSCRIBE.message.getPayload().getSUBSCRIBEPayload().topic;
-        Geofence geofence = processSUBSCRIBE.message.getPayload().getSUBSCRIBEPayload().geofence;
-        ActorRef wsClientActor = processSUBSCRIBE.wsClientActor;
-        Subscription subscription = new Subscription(subscriptionId, topic, geofence, wsClientActor);
-
-        subscriptions.put(clientId, subscription);
-        raster.putSubscriptionIdIntoRasterEntries(geofence, subscriptionId);
-
+        subscriptions.put(processSUBSCRIBE.subscription.getSubscriptionId().getLeft(), processSUBSCRIBE.subscription);
+        raster.putSubscriptionIdIntoRasterEntries(processSUBSCRIBE.subscription.getGeofence(), processSUBSCRIBE.subscription.getSubscriptionId());
     }
 
     private void receiveProcessPUBLISH(ProcessPUBLISH processPUBLISH){
         log.info("TopicShardEntity actor received ProcessPUBLISH " + topicShardId);
-
         // Subscriber PublisherGeoMatching
         List<ImmutablePair<String, String>> subscriptionIds = raster.getSubscriptionIdsInRasterEntryForPublisherLocation(processPUBLISH.clientLocation);
         log.info("Subscriptions found : " + subscriptionIds.size());
-
         subscriptionIds.forEach((sub) -> {
             Subscription subscription = subscriptions.get(sub.left);
             PublisherGeoMatching publisherGeoMatching = new PublisherGeoMatching(processPUBLISH, subscription);
-            clientShardRegion.tell(publisherGeoMatching, getSelf());
+            if(processPUBLISH.wsClientActor != subscription.getWsClientActor()){
+                clientShardRegion.tell(publisherGeoMatching, getSelf());
+            }
         });
-
     }
-
 
 }
