@@ -24,12 +24,11 @@ public class WsServerActor extends AbstractActor {
 
     private final ActorContext context = getContext();
     private final ActorSystem system = context.getSystem();
-    private final LoggingAdapter log = Logging.getLogger(system, this);
+    private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private final CompletionStage<ServerBinding> binding; // The HttpServerActor server binding
     private String webSocketActorId;
 
     public WsServerActor(ActorRef clientShardRegion) {
-
         // Set up TCP WsServerActor Server
         final Materializer materializer = ActorMaterializer.create(system);
 
@@ -47,7 +46,6 @@ public class WsServerActor extends AbstractActor {
                 routeFlow, ConnectHttp.toHost(hostname, port), materializer);
 
         log.info("New Server online at ws://{}:{}/", hostname, port);
-
     }
 
     @Override

@@ -41,7 +41,7 @@ import java.util.Optional;
                 path("test", () ->
                         get(() -> {
                             System.out.println("WsServerActor connection on route {/test} has been initiated." );
-                            return complete("Test completed");
+                            return complete("Test successfully completed.");
                         })
                 ),
                 path("api", () ->
@@ -60,9 +60,8 @@ import java.util.Optional;
     }
 
     private Flow<Message, Message, NotUsed> createWebSocketFlow() {
-
+        // Create WsClientActor
         ActorRef wsClientActor = system.actorOf(Props.create(WsClientActor.class, clientShardRegion));
-
         System.out.println("TCP Connection opened");
 
         // Outgoing messages

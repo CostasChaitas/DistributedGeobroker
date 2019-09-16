@@ -23,9 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientShardEntity extends AbstractActor {
 
-    private final Address actorSystemAddress = getContext().system().provider().getDefaultAddress();
-    private LoggingAdapter log = Logging.getLogger(getContext().system(), getSelf().path().toStringWithAddress(actorSystemAddress));
-
+    private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private final ActorSystem actorSystem = getContext().getSystem();
     private final ActorRef topicShardRegion = ClusterSharding.get(actorSystem).shardRegion("Topics");
     private String clientShardEntityId;
@@ -57,7 +55,7 @@ public class ClientShardEntity extends AbstractActor {
     }
 
     private void receiveProcessCONNECT(ProcessCONNECT processCONNECT) {
-        log.info("Message ProcessCONNECT received ");
+        log.info("ClientShardEntity {} received message ProcessCONNECT", clientShardEntityId);
         // Check if it's needed to update clientActor
         if(clientLocation != null){
             for (Map.Entry<Topic, Subscription> sub : subscriptions.entrySet()) {
@@ -69,9 +67,7 @@ public class ClientShardEntity extends AbstractActor {
         }
         // Connect ClientShardEntity and update the location
         clientLocation = processCONNECT.message.getPayload().getCONNECTPayload().location;
-        log.info( "wsClientActor" + wsClientActor);
         wsClientActor = processCONNECT.wsClientActor;
-
         // Sending ACK
         CONNACKPayload connackPayload = new CONNACKPayload(ReasonCode.Success);
         ExternalMessage CONNACK = new ExternalMessage(
@@ -84,13 +80,13 @@ public class ClientShardEntity extends AbstractActor {
     }
 
     private void receiveProcessDISCONNECT(ProcessDISCONNECT processDISCONNECT) {
-        System.out.println("Message ProcessDISCONNECT received");
+        log.info("ClientShardEntity {} received message ProcessDISCONNECT", clientShardEntityId);
         clientLocation = null;
         wsClientActor = null;
     }
 
     private void receiveProcessPINGREQ(ProcessPINGREQ processPINGREQ) {
-        log.info("Message ProcessPINGREQ received ");
+        log.info("ClientShardEntity {} received message ProcessPINGREQ", clientShardEntityId);
         // Check if client is connected
         if(this.clientLocation == null){
             PINGRESPPayload pingrespPayload = new PINGRESPPayload(ReasonCode.NotConnected);
@@ -115,10 +111,8 @@ public class ClientShardEntity extends AbstractActor {
             sender().tell(sendACK, getSender());
             return;
         }
-
         // Update location
         clientLocation = processPINGREQ.message.getPayload().getPINGREQPayload().location;
-
         // Sending ACK
         PINGRESPPayload pingrespPayload = new PINGRESPPayload(ReasonCode.Success);
         ExternalMessage PINGRESP = new ExternalMessage(
@@ -131,7 +125,7 @@ public class ClientShardEntity extends AbstractActor {
     }
 
     private void receiveProcessUNSUBSCRIBE(ProcessUNSUBSCRIBE processUNSUBSCRIBE) {
-        log.info("Message ProcessUNSUBSCRIBE received ");
+        log.info("ClientShardEntity {} received message ProcessUNSUBSCRIBE", clientShardEntityId);
         // Check if client is connected
         if(this.clientLocation == null){
             UNSUBACKPayload unsubackPayload = new UNSUBACKPayload(ReasonCode.NotConnected);
@@ -144,7 +138,6 @@ public class ClientShardEntity extends AbstractActor {
             sender().tell(sendACK, getSender());
             return;
         }
-
         // Check if connection already exists
         if(this.wsClientActor.compareTo(processUNSUBSCRIBE.wsClientActor) != 0){
             UNSUBACKPayload unsubackPayload = new UNSUBACKPayload(ReasonCode.ConnectionAlreadyExist);
@@ -157,12 +150,10 @@ public class ClientShardEntity extends AbstractActor {
             sender().tell(sendACK, getSender());
             return;
         }
-
         // Unsubscribe
         subscriptions.remove(processUNSUBSCRIBE.message.getPayload().getUNSUBSCRIBEPayload().topic);
-        // Ask TileShardEntity Entity
+        // Send message to TileShardEntity Entity
         topicShardRegion.tell(processUNSUBSCRIBE, getSelf());
-
         // Sending ACK
         UNSUBACKPayload unsubackPayload = new UNSUBACKPayload(ReasonCode.Success);
         ExternalMessage UNSUBACK = new ExternalMessage(
@@ -175,8 +166,7 @@ public class ClientShardEntity extends AbstractActor {
     }
 
     private void receiveProcessSUBSCRIBE(ProcessSUBSCRIBE processSUBSCRIBE) {
-        log.info("Message ProcessSUBSCRIBE received ");
-
+        log.info("ClientShardEntity {} received message processSUBSCRIBE", clientShardEntityId);
         // Check if client is connected
         if(this.clientLocation == null){
             SUBACKPayload subackPayload = new SUBACKPayload(ReasonCode.NotConnected);
@@ -189,7 +179,6 @@ public class ClientShardEntity extends AbstractActor {
             sender().tell(sendACK, getSender());
             return;
         }
-
         // Check if connection already exists
         if(this.wsClientActor.compareTo(processSUBSCRIBE.wsClientActor) != 0){
             SUBACKPayload subackPayload = new SUBACKPayload(ReasonCode.ConnectionAlreadyExist);
@@ -210,16 +199,11 @@ public class ClientShardEntity extends AbstractActor {
         Geofence geofence = processSUBSCRIBE.message.getPayload().getSUBSCRIBEPayload().geofence;
         ActorRef wsClientActor = processSUBSCRIBE.wsClientActor;
         Subscription subscription = new Subscription(subscriptionId, topic, geofence, wsClientActor);
-
         // Register subscription for the client
         subscriptions.put(topic, subscription);
-
-        log.info("There are  : " + subscriptions.size() + " subs for client "  + processSUBSCRIBE.message.getClientIdentifier());
-
-        // Ask TileShardEntity Entity
+        // Send message to TileShardEntity Entity
         processSUBSCRIBE.subscription = subscription;
         topicShardRegion.tell(processSUBSCRIBE, getSelf());
-
         // Sending ACK
         SUBACKPayload subackPayload = new SUBACKPayload(ReasonCode.Success);
         ExternalMessage SUBACK = new ExternalMessage(
@@ -232,7 +216,7 @@ public class ClientShardEntity extends AbstractActor {
     }
 
     private void receiveProcessPUBLISH(ProcessPUBLISH processPUBLISH) {
-        log.info("Message ProcessPUBLISH received ");
+        log.info("ClientShardEntity {} received message ProcessPUBLISH", clientShardEntityId);
         // Check if client is connected
         if(this.clientLocation == null){
             PUBACKPayload pubackPayload = new PUBACKPayload(ReasonCode.NotConnected);
@@ -245,7 +229,6 @@ public class ClientShardEntity extends AbstractActor {
             sender().tell(sendACK, getSender());
             return;
         }
-
         // Check if connection already exist
         if(this.wsClientActor.compareTo(processPUBLISH.wsClientActor) != 0){
             PUBACKPayload pubackPayload = new PUBACKPayload(ReasonCode.ConnectionAlreadyExist);
@@ -258,10 +241,9 @@ public class ClientShardEntity extends AbstractActor {
             sender().tell(sendACK, getSender());
             return;
         }
-        // Ask TileShardEntity Entity
+        // Get client location and Send message to TileShardEntity Entity
         processPUBLISH.clientLocation = clientLocation;
         topicShardRegion.tell(processPUBLISH, getSelf());
-
         // Sending ACK
         PUBACKPayload pubackPayload = new PUBACKPayload(ReasonCode.Success);
         ExternalMessage PUBACK = new ExternalMessage(
@@ -273,9 +255,8 @@ public class ClientShardEntity extends AbstractActor {
         sender().tell(sendACK, getSelf());
     }
 
-
     private void receivePublisherGeoMatching(PublisherGeoMatching publisherGeoMatching){
-        log.info("Doing the PublisherGeoMatching for " + clientShardEntityId);
+        log.info("ClientShardEntity {} received message PublisherGeoMatching", clientShardEntityId);
         // Publisher geo matching
         Boolean isPublisherGeoMatching = publisherGeoMatching(publisherGeoMatching.publication);
         if(isPublisherGeoMatching){
@@ -296,6 +277,5 @@ public class ClientShardEntity extends AbstractActor {
         }
         return false;
     }
-
 
 }

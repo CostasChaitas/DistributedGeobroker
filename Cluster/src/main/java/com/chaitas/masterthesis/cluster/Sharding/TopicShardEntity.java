@@ -19,9 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TopicShardEntity extends AbstractActor {
 
-    private final Address actorSystemAddress = getContext().system().provider().getDefaultAddress();
-    private LoggingAdapter log = Logging.getLogger(getContext().system(), getSelf().path().toStringWithAddress(actorSystemAddress));
-
+    private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private final ActorRef clientShardRegion;
     private String topicShardId;
     private Raster raster;
@@ -51,29 +49,33 @@ public class TopicShardEntity extends AbstractActor {
     }
 
     private void receiveProcessUNSUBSCRIBE(ProcessUNSUBSCRIBE processUNSUBSCRIBE){
-        log.info("TopicShardEntity actor received ProcessUNSUBSCRIBE " + topicShardId);
+        log.info("TopicShardEntity {} received message ProcessUNSUBSCRIBE", topicShardId);
         // Unsubscribe
-        String clientId = processUNSUBSCRIBE.message.getClientIdentifier();
         Subscription subscription = subscriptions.get(processUNSUBSCRIBE.message.getClientIdentifier());
-        ImmutablePair subscriptionId = new ImmutablePair(clientId, subscription.getSubscriptionId().getRight());
-        raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscriptionId);
+        raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscription.getSubscriptionId());
     }
 
     private void receiveProcessSUBSCRIBE(ProcessSUBSCRIBE processSUBSCRIBE){
-        log.info("TopicShardEntity actor received ProcessSUBSCRIBE " + topicShardId);
+        log.info("TopicShardEntity {} received message ProcessSUBSCRIBE", topicShardId);
+        // Check if client has been already subscribed and remove old subscriptions
+        Subscription subscription = subscriptions.get(processSUBSCRIBE.subscription.getSubscriptionId().getLeft());
+        if(subscription != null){
+            log.info("Subscription exist" );
+            raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscription.getSubscriptionId());
+        }
         // Register subscription for the client
         subscriptions.put(processSUBSCRIBE.subscription.getSubscriptionId().getLeft(), processSUBSCRIBE.subscription);
         raster.putSubscriptionIdIntoRasterEntries(processSUBSCRIBE.subscription.getGeofence(), processSUBSCRIBE.subscription.getSubscriptionId());
     }
 
     private void receiveProcessPUBLISH(ProcessPUBLISH processPUBLISH){
-        log.info("TopicShardEntity actor received ProcessPUBLISH " + topicShardId);
-        // Subscriber PublisherGeoMatching
+        log.info("TopicShardEntity {} received message ProcessPUBLISH", topicShardId);
+        // Subscriber GeoMatching
         List<ImmutablePair<String, String>> subscriptionIds = raster.getSubscriptionIdsInRasterEntryForPublisherLocation(processPUBLISH.clientLocation);
-        log.info("Subscriptions found : " + subscriptionIds.size());
         subscriptionIds.forEach((sub) -> {
             Subscription subscription = subscriptions.get(sub.left);
             PublisherGeoMatching publisherGeoMatching = new PublisherGeoMatching(processPUBLISH, subscription);
+            // Check if publisher is the subscriber
             if(processPUBLISH.wsClientActor != subscription.getWsClientActor()){
                 clientShardRegion.tell(publisherGeoMatching, getSelf());
             }

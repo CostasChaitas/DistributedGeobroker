@@ -3,7 +3,6 @@
 package com.chaitas.masterthesis.commons;
 
 public enum ControlPacketType {
-    Reserved, //
     CONNECT, //
     CONNACK, //
     DISCONNECT, //

@@ -11,7 +11,7 @@ public class ProcessDISCONNECT {
     public ActorRef wsClientActor;
 
     public ProcessDISCONNECT(@NotNull @JsonProperty("message") ExternalMessage message,
-                          @NotNull @JsonProperty("wsClientActor") ActorRef wsClientActor){
+                             @NotNull @JsonProperty("wsClientActor") ActorRef wsClientActor){
         this.message = message;
         this.wsClientActor = wsClientActor;
     }
