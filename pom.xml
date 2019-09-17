@@ -10,7 +10,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>git_submodules/spatial4j</module>
         <module>Commons</module>
         <module>Cluster</module>
         <module>Client</module>
@@ -22,7 +21,6 @@
         <akka.version>2.5.23</akka.version>
         <akka.http.version>10.1.8</akka.http.version>
         <akka.management.version>1.0.0</akka.management.version>
-        <fst.version>2.56</fst.version>
         <kotlin.version>1.2.71</kotlin.version>
     </properties>
 
@@ -166,11 +164,6 @@
             <groupId>com.lightbend.akka.management</groupId>
             <artifactId>akka-management-cluster-http_${scala.version}</artifactId>
             <version>${akka.management.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180130</version>
         </dependency>
         <!-- Spatial -->
         <dependency>
