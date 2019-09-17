@@ -22,8 +22,6 @@ class KryoSerializer {
      * Specifying new customised serialisers for kryo to work on our different payloads
      */
     init {
-        System.out.println("KryoSerializer registering classes....")
-
         kryo.register(Topic::class.java, object : Serializer<Topic>() {
             override fun write(kryo: Kryo, output: Output, o: Topic) {
                 kryo.writeObjectOrNull(output, o.topic, String::class.java)
@@ -199,7 +197,20 @@ class KryoSerializer {
             override fun write(kryo: Kryo, output: Output, o: ExternalMessage) {
                 kryo.writeObjectOrNull(output, o.clientIdentifier, String::class.java)
                 kryo.writeObjectOrNull(output, o.controlPacketType, ControlPacketType::class.java)
-                kryo.writeObjectOrNull(output, o.payload, PUBLISHPayload::class.java)
+                when (o.controlPacketType) {
+                    ControlPacketType.CONNACK -> kryo.writeObjectOrNull(output, o.payload, CONNACKPayload::class.java)
+                    ControlPacketType.CONNECT -> kryo.writeObjectOrNull(output, o.payload, CONNECTPayload::class.java)
+                    ControlPacketType.DISCONNECT -> kryo.writeObjectOrNull(output, o.payload, DISCONNECTPayload::class.java)
+                    ControlPacketType.PINGREQ -> kryo.writeObjectOrNull(output, o.payload, PINGREQPayload::class.java)
+                    ControlPacketType.PINGRESP -> kryo.writeObjectOrNull(output, o.payload, PINGRESPPayload::class.java)
+                    ControlPacketType.PUBACK -> kryo.writeObjectOrNull(output, o.payload, PUBACKPayload::class.java)
+                    ControlPacketType.PUBLISH -> kryo.writeObjectOrNull(output, o.payload, PUBLISHPayload::class.java)
+                    ControlPacketType.SUBACK -> kryo.writeObjectOrNull(output, o.payload, SUBACKPayload::class.java)
+                    ControlPacketType.SUBSCRIBE -> kryo.writeObjectOrNull(output, o.payload, SUBSCRIBEPayload::class.java)
+                    ControlPacketType.UNSUBACK -> kryo.writeObjectOrNull(output, o.payload, UNSUBACKPayload::class.java)
+                    ControlPacketType.UNSUBSCRIBE -> kryo.writeObjectOrNull(output, o.payload, UNSUBSCRIBEPayload::class.java)
+                    ControlPacketType.INCOMPATIBLEPayload -> kryo.readObjectOrNull(input, INCOMPATIBLEPayload::class.java)
+                }
             }
 
             override fun read(kryo: Kryo, input: Input, aClass: Class<ExternalMessage>): ExternalMessage? {
@@ -209,8 +220,7 @@ class KryoSerializer {
                 when (controlPacketType) {
                     ControlPacketType.CONNACK -> o = kryo.readObjectOrNull(input, CONNACKPayload::class.java) ?: return null
                     ControlPacketType.CONNECT -> o = kryo.readObjectOrNull(input, CONNECTPayload::class.java) ?: return null
-                    ControlPacketType.DISCONNECT -> o =
-                            kryo.readObjectOrNull(input, DISCONNECTPayload::class.java) ?: return null
+                    ControlPacketType.DISCONNECT -> o = kryo.readObjectOrNull(input, DISCONNECTPayload::class.java) ?: return null
                     ControlPacketType.PINGREQ -> o = kryo.readObjectOrNull(input, PINGREQPayload::class.java) ?: return null
                     ControlPacketType.PINGRESP -> o = kryo.readObjectOrNull(input, PINGRESPPayload::class.java) ?: return null
                     ControlPacketType.PUBACK -> o = kryo.readObjectOrNull(input, PUBACKPayload::class.java) ?: return null
@@ -219,6 +229,7 @@ class KryoSerializer {
                     ControlPacketType.SUBSCRIBE -> o = kryo.readObjectOrNull(input, SUBSCRIBEPayload::class.java) ?: return null
                     ControlPacketType.UNSUBACK -> o = kryo.readObjectOrNull(input, UNSUBACKPayload::class.java) ?: return null
                     ControlPacketType.UNSUBSCRIBE -> o = kryo.readObjectOrNull(input, UNSUBSCRIBEPayload::class.java) ?: return null
+                    ControlPacketType.INCOMPATIBLEPayload -> o = kryo.readObjectOrNull(input, INCOMPATIBLEPayload::class.java) ?: return null
                     else -> return null
                 }
                 return ExternalMessage(clientIdentifier, controlPacketType, o)

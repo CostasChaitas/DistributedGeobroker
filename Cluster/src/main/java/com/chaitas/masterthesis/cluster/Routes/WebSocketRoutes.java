@@ -5,6 +5,8 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.PoisonPill;
 import akka.actor.Props;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.http.javadsl.model.ws.Message;
 import akka.http.javadsl.model.ws.TextMessage;
 import akka.http.javadsl.server.AllDirectives;
@@ -25,7 +27,7 @@ import com.chaitas.masterthesis.commons.payloads.INCOMPATIBLEPayload;
 
 import java.util.Optional;
 
-    public class WebSocketRoutes extends AllDirectives {
+public class WebSocketRoutes extends AllDirectives {
 
     private final ActorSystem system;
     private final ActorRef clientShardRegion;
