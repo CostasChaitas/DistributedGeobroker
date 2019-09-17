@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 
 public class ProcessPUBLISH {
+    
     public ExternalMessage message;
     public ActorRef wsClientActor;
     public Location clientLocation;
