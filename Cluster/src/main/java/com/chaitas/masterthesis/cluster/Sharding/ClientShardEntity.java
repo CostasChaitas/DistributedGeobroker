@@ -265,7 +265,7 @@ public class ClientShardEntity extends AbstractActor {
         Boolean isPublisherGeoMatching = publisherGeoMatching(publisherGeoMatching.publication);
         if(isPublisherGeoMatching){
             ExternalMessage externalMessage = new ExternalMessage(
-                    clientShardEntityId,
+                    publisherGeoMatching.publication.message.getClientIdentifier(),
                     ControlPacketType.MATCH,
                     publisherGeoMatching.publication.message.getPayload().getPUBLISHPayload()
             );

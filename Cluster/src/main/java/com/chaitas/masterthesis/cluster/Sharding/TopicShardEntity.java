@@ -76,7 +76,7 @@ public class TopicShardEntity extends AbstractActor {
             Subscription subscription = subscriptions.get(sub.left);
             PublisherGeoMatching publisherGeoMatching = new PublisherGeoMatching(processPUBLISH, subscription);
             // Check if publisher is the subscriber
-            if(processPUBLISH.wsClientActor != subscription.getWsClientActor()){
+            if(processPUBLISH.message.getClientIdentifier().compareTo(subscription.getSubscriptionId().getLeft()) != 0) {
                 clientShardRegion.tell(publisherGeoMatching, getSelf());
             }
         });
