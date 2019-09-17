@@ -50,10 +50,12 @@ mvn exec:java -Dexec.mainClass=Main -Dexec.args="2553 8082" -pl Cluster
 
 
 ## Load balancer
-In order to distribute the load between the servers/nodes, a load balΩ
+In order to distribute the load between the servers/nodes, a load balancer can be used.
 * haproxy - fast and reliable http reverse proxy and load balancer,
 
 Simple configuration for haproxy daemon can be found in resources dir. Run it with: 
-``` haproxy -f src/main/resources/haproxy.conf ```
+``` 
+haproxy -f src/main/resources/haproxy.conf 
+```
 
 This will set up a round-robing load balancer with frontend on port 8000 and backends on 8080, 8081 and 8082.
