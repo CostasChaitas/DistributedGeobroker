@@ -1,4 +1,4 @@
-package com.chaitas.masterthesis.cluster.util;
+package com.chaitas.masterthesis.cluster.Utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;

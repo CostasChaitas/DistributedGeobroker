@@ -58,11 +58,16 @@ public class ClientShardEntity extends AbstractActor {
         log.info("ClientShardEntity {} received message ProcessCONNECT", clientShardEntityId);
         // Check if it's needed to update clientActor
         if(clientLocation != null){
-            for (Map.Entry<Topic, Subscription> sub : subscriptions.entrySet()) {
-                Subscription newSub = sub.getValue();
-                newSub.setWsClientActor(sender());
-                log.info( "Telling TopicShardRegion to update user connections");
-                topicShardRegion.tell(newSub, getSelf());
+            for (Map.Entry<Topic, Subscription> subValue : subscriptions.entrySet()) {
+                Subscription sub = subValue.getValue();
+                ExternalMessage SUBSCRIBE = new ExternalMessage(
+                        sub.getSubscriptionId().getLeft(),
+                        ControlPacketType.SUBSCRIBE,
+                        new SUBSCRIBEPayload(sub.getTopic(), sub.getGeofence())
+                );
+                ProcessSUBSCRIBE processSUBSCRIBE = new ProcessSUBSCRIBE(SUBSCRIBE, processCONNECT.wsClientActor);
+                processSUBSCRIBE.subscription = sub;
+                topicShardRegion.tell(processSUBSCRIBE, getSelf());
             }
         }
         // Connect ClientShardEntity and update the location
@@ -197,7 +202,6 @@ public class ClientShardEntity extends AbstractActor {
         ImmutablePair<String, String> subscriptionId = new ImmutablePair(clientId, subId);
         Topic topic = processSUBSCRIBE.message.getPayload().getSUBSCRIBEPayload().topic;
         Geofence geofence = processSUBSCRIBE.message.getPayload().getSUBSCRIBEPayload().geofence;
-        ActorRef wsClientActor = processSUBSCRIBE.wsClientActor;
         Subscription subscription = new Subscription(subscriptionId, topic, geofence, wsClientActor);
         // Register subscription for the client
         subscriptions.put(topic, subscription);

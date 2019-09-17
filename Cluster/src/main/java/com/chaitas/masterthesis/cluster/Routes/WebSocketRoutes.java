@@ -16,7 +16,7 @@ import akka.stream.javadsl.Source;
 import akka.util.ByteString;
 import com.chaitas.masterthesis.cluster.Actors.WsClientActor;
 import com.chaitas.masterthesis.cluster.Messages.OutgoingDestination;
-import com.chaitas.masterthesis.cluster.util.JSONable;
+import com.chaitas.masterthesis.cluster.Utils.JSONable;
 import com.chaitas.masterthesis.commons.ControlPacketType;
 import com.chaitas.masterthesis.commons.KryoSerializer;
 import com.chaitas.masterthesis.commons.ReasonCode;

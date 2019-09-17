@@ -1,10 +1,10 @@
-# MasterThesis
-
+# Master Thesis from Konstantinos Chaitas
+ 
 ## Title: Design and Implementation of a Scalable, Distributed, Location-Based Pub/Sub System
 
 This project/research is based on the [Geobroker project](https://github.com/MoeweX/geobroker) from Jonathan Hasenburg.
 
-## Instructions
+## Quickstart
 
 This is a Maven, Java, Akka project. 
 
@@ -49,9 +49,8 @@ mvn exec:java -Dexec.mainClass=Main -Dexec.args="2553 8082" -pl Cluster
 
 
 
-## Measuring requests per second
-In order to distribute the load between the servers/nodes, a load balancer can be userd :
-
+## Load balancer
+In order to distribute the load between the servers/nodes, a load balΩ
 * haproxy - fast and reliable http reverse proxy and load balancer,
 
 Simple configuration for haproxy daemon can be found in resources dir. Run it with: 

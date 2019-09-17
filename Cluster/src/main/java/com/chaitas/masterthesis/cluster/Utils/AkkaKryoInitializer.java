@@ -1,4 +1,4 @@
-package com.chaitas.masterthesis.cluster.util;
+package com.chaitas.masterthesis.cluster.Utils;
 
 import akka.actor.ActorRef;
 import akka.actor.FunctionRef;
@@ -15,17 +15,17 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 public class AkkaKryoInitializer {
 
     // Required method for kryo serialization
     public void customize(Kryo kryo) {
-        System.out.println("Registering the classes...");
-
         // General
         kryo.register(String[].class, 250);
         kryo.register(FunctionRef.class, 251);
         kryo.register(ActorRef.class, 249);
+        kryo.register(ImmutablePair.class, 250);
 
         // Included in ExternalMessage
         kryo.register(ControlPacketType.class, 253);
