@@ -11,6 +11,7 @@ services:
     ports:
     - '2552:2552'
     - '8000:8000'
+    - '8558:8558'
     environment:
       SERVER_IP: 0.0.0.0
       CLUSTER_IP: seed
@@ -20,7 +21,7 @@ services:
       - cluster-network
     image: master-thesis-cluster:1.0.0
     ports:
-    - '8001:8001'
+    - '8001:8000'
     environment:
       SERVER_IP: 0.0.0.0
       CLUSTER_IP: node1
@@ -36,6 +37,6 @@ services:
     environment:
       SERVER_IP: 0.0.0.0
       CLUSTER_IP: node2
-      CLUSTER_PORT: 1600
+      CLUSTER_PORT: 1601
       CLUSTER_SEED_IP: seed
       CLUSTER_SEED_PORT: 2552
