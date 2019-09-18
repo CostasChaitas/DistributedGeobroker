@@ -1,11 +1,18 @@
-# MasterThesis
+# Master Thesis from Konstantinos Chaitas
+ 
+## Title: Design and Implementation of a Scalable, Distributed, Location-Based Pub/Sub System
 
-## Title: Design and Implementation of a Scalable, Distributed, spatial.Location-Based Pub/Sub System
+This project/research is based on the [Geobroker project](https://github.com/MoeweX/geobroker) from Jonathan Hasenburg.
 
-## Instructions
+## Quickstart
 
 This is a Maven, Java, Akka project. 
 
+As this project contains multiple git submodules, one needs to run the following after cloning:
+```
+git submodule init
+git submodule update
+```
 
 In order to build the project please run the following commands
 ```
@@ -42,20 +49,13 @@ mvn exec:java -Dexec.mainClass=Main -Dexec.args="2553 8082" -pl Cluster
 
 
 
-## Measuring requests per second
-You can test both applications on your local machine by using:
-
-* ab - Apache HTTP server benchmarking tool,
-* parallel - GNU Parallel - The Command-Line Power Tool,
+## Load balancer
+In order to distribute the load between the servers/nodes, a load balancer can be used.
 * haproxy - fast and reliable http reverse proxy and load balancer,
-* provided URLs.txt
 
-Akka configuration is capped so that we can simulate different conditions on commodity laptop.
+Simple configuration for haproxy daemon can be found in resources dir. Run it with: 
+``` 
+haproxy -f src/main/resources/haproxy.conf 
+```
 
-For benchmarking sharded application you need to use haproxy. Simple configuration for haproxy daemon can be found in resources dir. Run it with: 
-``` haproxy -f src/main/resources/haproxy.conf ```
-
-This will set up a round-robing load balancer with frontend on port 8000 and backends on 8080, 8081 and 8082. You can then use different URLs.txt file:
-```  
-cat src/main/resources/shardedURLs.txt | parallel -j 5 'ab -ql -n 2000 -c 1 -k {}' | grep 'Requests per second'
- ```
+This will set up a round-robing load balancer with frontend on port 8000 and backends on 8080, 8081 and 8082.

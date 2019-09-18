@@ -3,15 +3,14 @@
 package com.chaitas.masterthesis.commons.payloads;
 
 import com.chaitas.masterthesis.commons.ReasonCode;
-import com.chaitas.masterthesis.commons.payloads.AbstractPayload;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 
-public class UNSUBACKPayload extends AbstractPayload {
+public class INCOMPATIBLEPayload extends AbstractPayload {
 
     public ReasonCode reasonCode;
 
-    public UNSUBACKPayload(@NotNull @JsonProperty("reasonCode") ReasonCode reasonCode){
+    public INCOMPATIBLEPayload(@NotNull @JsonProperty("reasonCode") ReasonCode reasonCode){
         this.reasonCode = reasonCode;
     }
 }

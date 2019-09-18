@@ -1,6 +1,7 @@
 package com.chaitas.masterthesis.cluster.Actors;
 
 import akka.actor.*;
+<<<<<<< HEAD
 import akka.cluster.sharding.ShardRegion;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
@@ -31,6 +32,25 @@ public class WsClientActor extends AbstractActor {
 
     public WsClientActor(ActorRef shardRegion) {
         this.shardRegion = shardRegion;
+=======
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import com.chaitas.masterthesis.cluster.Messages.*;
+import com.chaitas.masterthesis.commons.ControlPacketType;
+import com.chaitas.masterthesis.commons.ReasonCode;
+import com.chaitas.masterthesis.commons.message.ExternalMessage;
+import com.chaitas.masterthesis.commons.payloads.*;
+
+public class WsClientActor extends AbstractActor {
+
+    private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+    private final ActorRef clientShardRegion;
+    private String wsClientActorId;
+    private ActorRef outgoing;
+
+    public WsClientActor(ActorRef clientShardRegion) {
+        this.clientShardRegion = clientShardRegion;
+>>>>>>> master
     }
 
     @Override
@@ -49,6 +69,7 @@ public class WsClientActor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
+<<<<<<< HEAD
 
                 // Incoming from WS
                 .match(InternalServerMessage.class, message-> receiveInternalServerMessage(message))
@@ -66,10 +87,23 @@ public class WsClientActor extends AbstractActor {
     private void receiveInternalServerMessage(InternalServerMessage message) {
         log.info("WsClientActor Actor received InternalServerMessage ");
 
+=======
+            // Incoming from WS
+            .match(ExternalMessage.class, message-> receiveExternalMessage(message))
+            .match(OutgoingDestination.class, message -> receiveOutgoingDestination(message))
+            // Incoming from Sharding Entity - ClientShardEntity
+            .match(SendACK.class, message-> receiveSendACK(message))
+            .build();
+    }
+
+    private void receiveExternalMessage(ExternalMessage message) {
+        log.info("WsClientActor Actor received ExternalMessage ");
+>>>>>>> master
         switch (message.getControlPacketType()) {
                 case CONNECT:
                     CONNECTPayload connectPayload = message.getPayload().getCONNECTPayload();
                     if (connectPayload != null) {
+<<<<<<< HEAD
                         log.info("Message CONNECTPayload received :" + connectPayload.location);
 
                         // Connect WsClient and update the location
@@ -86,12 +120,25 @@ public class WsClientActor extends AbstractActor {
                         );
 
                         outgoing.tell(internalServerMessage, getSender());
+=======
+                        log.info("WsClientActor {} received message CONNECTPayload", wsClientActorId);
+                        ProcessCONNECT processCONNECT = new ProcessCONNECT(message, getSelf());
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processCONNECT, getSelf());
+>>>>>>> master
                     }
                     break;
                 case DISCONNECT:
                     DISCONNECTPayload disconnectPayload = message.getPayload().getDISCONNECTPayload();
                     if (disconnectPayload != null) {
+<<<<<<< HEAD
                         System.out.println("Message DISCONNECTPayload received :" + disconnectPayload.reasonCode);
+=======
+                        log.info("WsClientActor {} received message DISCONNECTPayload", wsClientActorId);
+                        ProcessDISCONNECT processDISCONNECT = new ProcessDISCONNECT(message, getSelf());
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processDISCONNECT, getSelf());
+>>>>>>> master
                         // Killing current WsClientActor
                         getSelf().tell(PoisonPill.getInstance(), getSelf());
                     }
@@ -99,6 +146,7 @@ public class WsClientActor extends AbstractActor {
                 case PINGREQ:
                     PINGREQPayload pingreqPayload = message.getPayload().getPINGREQPayload();
                     if (pingreqPayload != null) {
+<<<<<<< HEAD
                         log.info("Message PINGREQ received :" + pingreqPayload.location);
 
                         // Check if Client is connected
@@ -128,11 +176,18 @@ public class WsClientActor extends AbstractActor {
                         outgoing.tell(internalServerMessage, getSender());
                         // tileDeciderActor.tell(new ProcessSUBSCRIBE(message, outgoing),  getSelf());
 
+=======
+                        log.info("WsClientActor {} received message PINGREQ", wsClientActorId);
+                        ProcessPINGREQ processPINGREQ = new ProcessPINGREQ(message, getSelf());
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processPINGREQ, getSelf());
+>>>>>>> master
                     }
                     break;
                 case SUBSCRIBE:
                     SUBSCRIBEPayload subscribePayload = message.getPayload().getSUBSCRIBEPayload();
                     if (subscribePayload != null) {
+<<<<<<< HEAD
                         log.info("Message SUBSCRIBE received :" + subscribePayload.getTopic());
 
                         // Check if Client is connected
@@ -164,11 +219,27 @@ public class WsClientActor extends AbstractActor {
                         // Ask TileManager Entity
                         Patterns.ask(shardRegion, processSUBSCRIBE, 3000);
 
+=======
+                        log.info("WsClientActor {} received message SUBSCRIBE", wsClientActorId);
+                        ProcessSUBSCRIBE processSUBSCRIBE = new ProcessSUBSCRIBE(message, getSelf());
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processSUBSCRIBE, getSelf());
+                    }
+                    break;
+                case UNSUBSCRIBE:
+                    UNSUBSCRIBEPayload unsubscribePayload = message.getPayload().getUNSUBSCRIBEPayload();
+                    if (unsubscribePayload != null) {
+                        log.info("WsClientActor {} received message UNSUBSCRIBE", wsClientActorId);
+                        ProcessUNSUBSCRIBE processUNSUBSCRIBE = new ProcessUNSUBSCRIBE(message, getSelf());
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processUNSUBSCRIBE, getSelf());
+>>>>>>> master
                     }
                     break;
                 case PUBLISH:
                     PUBLISHPayload publishPayload = message.getPayload().getPUBLISHPayload();
                     if (publishPayload != null) {
+<<<<<<< HEAD
                         log.info("WsClientActor Actor: Message PUBLISH received :" + publishPayload.getTopic());
 
                         // Check if Client is connected
@@ -189,10 +260,34 @@ public class WsClientActor extends AbstractActor {
                     }
                     break;
                 default:
+=======
+                        log.info("WsClientActor {} received message PUBLISH", wsClientActorId);
+                        ProcessPUBLISH processPUBLISH = new ProcessPUBLISH(message, getSelf(), null);
+                        // Ask clientShardRegion Entity
+                        clientShardRegion.tell(processPUBLISH, getSelf());
+                    }
+                    break;
+                case MATCH:
+                    PUBLISHPayload publishPayload1 = message.getPayload().getPUBLISHPayload();
+                    if (publishPayload1 != null) {
+                        log.info("WsClientActor {} received message MATCH", wsClientActorId);
+                        outgoing.tell(message, getSelf());
+                    }
+                    break;
+                default:
+                    log.info("WsClientActor {} received message INCOMPATIBLE", wsClientActorId);
+                    ExternalMessage externalMessage = new ExternalMessage(
+                            "404",
+                            ControlPacketType.INCOMPATIBLEPayload,
+                            new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload)
+                    );
+                    outgoing.tell(externalMessage, getSender());
+>>>>>>> master
                     log.info("Cannot process message +" + message.toString());
         }
     }
 
+<<<<<<< HEAD
 
 
     private void receiveGeoMatching(GeoMatching geoMatching){
@@ -267,6 +362,18 @@ public class WsClientActor extends AbstractActor {
         getContext().getParent().tell(
                 new ShardRegion.Passivate(PoisonPill.getInstance()), getSelf());
     }
+=======
+    private void receiveSendACK(SendACK sendACK) {
+        log.info("WsClientActor {} received message SendACK", wsClientActorId);
+        outgoing.tell(sendACK.message, getSender());
+    }
+
+    private void receiveOutgoingDestination(OutgoingDestination message) {
+        log.info("WsClientActor {} received message OutgoingDestination", wsClientActorId);
+        outgoing = message.destination;
+    }
+
+>>>>>>> master
 }
 
 

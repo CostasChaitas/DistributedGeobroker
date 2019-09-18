@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+// Code adapted from Geobroker project : https://github.com/MoeweX/geobroker
+
+>>>>>>> master
 package com.chaitas.masterthesis.commons.spatial;
 
 import org.locationtech.spatial4j.context.jts.JtsSpatialContext;

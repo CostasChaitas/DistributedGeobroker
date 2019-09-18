@@ -1,13 +1,12 @@
+// Code adapted from Geobroker project : https://github.com/MoeweX/geobroker
+
 package com.chaitas.masterthesis.commons.payloads;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.jetbrains.annotations.Nullable;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@payloadType")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CONNECTPayload.class, name = "CONNECTPayload"),
@@ -16,14 +15,13 @@ import org.jetbrains.annotations.Nullable;
         @JsonSubTypes.Type(value = PINGREQPayload.class, name = "PINGREQPayload"),
         @JsonSubTypes.Type(value = PINGRESPPayload.class, name = "PINGRESPPayload"),
         @JsonSubTypes.Type(value = SUBSCRIBEPayload.class, name = "SUBSCRIBEPayload"),
+        @JsonSubTypes.Type(value = UNSUBSCRIBEPayload.class, name = "UNSUBSCRIBEPayload"),
         @JsonSubTypes.Type(value = PUBLISHPayload.class, name = "PUBLISHPayload"),
         @JsonSubTypes.Type(value = SUBACKPayload.class, name = "SUBACKPayload"),
         @JsonSubTypes.Type(value = PUBACKPayload.class, name = "PUBACKPayload")
 })
 public abstract class AbstractPayload {
 
-    @JsonIgnore
-    @Nullable
     public final CONNECTPayload getCONNECTPayload() {
         return this instanceof CONNECTPayload ? (CONNECTPayload)this : null;
     }
@@ -34,14 +32,10 @@ public abstract class AbstractPayload {
         return this instanceof CONNACKPayload ? (CONNACKPayload)this : null;
     }
 
-    @JsonIgnore
-    @Nullable
     public final DISCONNECTPayload getDISCONNECTPayload() {
         return this instanceof DISCONNECTPayload ? (DISCONNECTPayload)this : null;
     }
 
-    @JsonIgnore
-    @Nullable
     public final PINGREQPayload getPINGREQPayload() {
         return this instanceof PINGREQPayload ? (PINGREQPayload)this : null;
     }
@@ -64,8 +58,6 @@ public abstract class AbstractPayload {
         return this instanceof PUBACKPayload ? (PUBACKPayload)this : null;
     }
 
-    @JsonIgnore
-    @Nullable
     public final SUBSCRIBEPayload getSUBSCRIBEPayload() {
         return this instanceof SUBSCRIBEPayload ? (SUBSCRIBEPayload)this : null;
     }
@@ -76,8 +68,6 @@ public abstract class AbstractPayload {
         return this instanceof SUBACKPayload ? (SUBACKPayload)this : null;
     }
 
-    @JsonIgnore
-    @Nullable
     public final UNSUBSCRIBEPayload getUNSUBSCRIBEPayload() {
         return this instanceof UNSUBSCRIBEPayload ? (UNSUBSCRIBEPayload)this : null;
     }
@@ -88,5 +78,13 @@ public abstract class AbstractPayload {
         return this instanceof UNSUBACKPayload ? (UNSUBACKPayload)this : null;
     }
 
+<<<<<<< HEAD
+=======
+    @JsonIgnore
+    @Nullable
+    public final INCOMPATIBLEPayload getINCOMPATIBLEPayload() {
+        return this instanceof INCOMPATIBLEPayload ? (INCOMPATIBLEPayload)this : null;
+    }
+>>>>>>> master
 
 }

@@ -1,3 +1,5 @@
+// Code adapted from Geobroker project : https://github.com/MoeweX/geobroker
+
 package com.chaitas.masterthesis.commons.message;
 
 import com.chaitas.masterthesis.commons.ControlPacketType;
@@ -6,12 +8,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public class InternalServerMessage {
+public class ExternalMessage {
     private String clientIdentifier;
     private ControlPacketType controlPacketType;
     private AbstractPayload payload;
 
-    public InternalServerMessage(
+    public ExternalMessage(
             @JsonProperty("clientIdentifier") String clientIdentifier,
             @JsonProperty("controlPacketType") ControlPacketType controlPacketType,
             @JsonProperty("payload") AbstractPayload payload) {
@@ -34,7 +36,7 @@ public class InternalServerMessage {
 
     @Override
     public String toString() {
-        return "InternalServerMessage{" +
+        return "ExternalMessage{" +
                 "clientIdentifier='" + clientIdentifier + '\'' +
                 ", controlPacketType=" + controlPacketType +
                 ", payload=" + payload +
@@ -46,10 +48,10 @@ public class InternalServerMessage {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof InternalServerMessage)) {
+        if (!(o instanceof ExternalMessage)) {
             return false;
         }
-        InternalServerMessage that = (InternalServerMessage) o;
+        ExternalMessage that = (ExternalMessage) o;
         return Objects.equals(getClientIdentifier(), that.getClientIdentifier()) &&
                 getControlPacketType() == that.getControlPacketType() &&
                 Objects.equals(getPayload(), that.getPayload());
