@@ -32,7 +32,7 @@ public class Main {
                 // Override the configuration of the port
                 Config config = ConfigFactory.parseString(
                         "akka.remote.netty.tcp.port = " + remoting + "\n" +
-                                "api.http.port = " + http).withFallback(baseConfig);
+                                "application.api.port = " + http).withFallback(baseConfig);
                 createAndStartActorSystem(actorSystemName, config);
             }
         }

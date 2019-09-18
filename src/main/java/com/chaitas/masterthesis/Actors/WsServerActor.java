@@ -35,7 +35,7 @@ public class WsServerActor extends AbstractActor {
         WebSocketRoutes routes = new WebSocketRoutes(system, clientShardRegion);
 
         Config config = system.settings().config();
-        String hostname = config.getString("application.api.hostname");
+        String hostname = config.getString("application.api.ip");
         int port = config.getInt("application.api.port");
 
         // Router
