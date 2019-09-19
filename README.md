@@ -83,3 +83,53 @@ To check the nodes and the status of the cluster you can use :
 ```
 GET http://localhost:8558/cluster/members
 ```
+
+
+## Run a cluster using Kubernetes
+
+First, make sure you have minikube installed. Start minikube : 
+```
+minikube start
+```
+In order that Kubernetes finds the locally published Docker image of our application run:
+```
+eval $(minikube docker-env)
+```
+Build local Docker registry:
+```
+mvn clean package docker:build
+```
+Create serviceAccount and role :
+```
+kubectl create -f kubernetes/akka-cluster-rbac.yml
+```
+Create deployment :
+```
+kubectl create -f kubernetes/akka-cluster-deployment.yml
+```
+Create service : 
+```
+kubectl create -f kubernetes/akka-cluster-service.yml
+```
+Get Kubernetes IP by running : 
+```
+minikube ip
+```
+Find the PORT for the services by running(there should be 2 services, 1 for the API and 1 for the Management) : 
+```
+kubectl get services
+```
+Use the services :
+```
+http://{{K8s_IP}}:{{Service_Port}}/cluster/members
+ws://{{K8s_IP}}:{{Service_Port}}/api
+```
+
+
+
+
+
+
+
+
+
