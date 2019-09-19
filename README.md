@@ -73,3 +73,16 @@ You can also configure auto scaling of the pods based on some criteria, e.g CPU 
 ```
 kubectl autoscale deployment master-thesis --cpu-percent=50 --min=3 --max=10
 ```
+
+In order to see the loggings of the cluster :
+```
+kubectl logs -l app=master-thesis-cluster
+```
+
+Clean up :
+```
+kubectl delete namespace master-thesis-namespace
+kubectl delete serviceaccount master-thesis-cluster
+kubectl delete clusterroles master-thesis-cluster
+kubectl delete clusterrolebindings master-thesis-cluster
+```
