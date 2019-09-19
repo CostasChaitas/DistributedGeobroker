@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: master-thesis
 spec:
-  replicas: 5
+  replicas: 3
   selector:
     matchLabels:
       app: master-thesis-cluster
