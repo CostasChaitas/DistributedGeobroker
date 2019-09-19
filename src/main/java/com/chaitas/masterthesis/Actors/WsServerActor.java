@@ -16,7 +16,6 @@ import akka.stream.javadsl.Flow;
 import com.chaitas.masterthesis.Routes.WebSocketRoutes;
 import com.typesafe.config.Config;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.CompletionStage;
 
@@ -30,7 +29,7 @@ public class WsServerActor extends AbstractActor {
     private final CompletionStage<ServerBinding> binding; // The HttpServerActor server binding
     private String webSocketActorId;
 
-    public WsServerActor(ActorRef clientShardRegion) throws UnknownHostException {
+    public WsServerActor(ActorRef clientShardRegion) {
         // Set up TCP WsServerActor Server
         final Materializer materializer = ActorMaterializer.create(system);
 
@@ -39,7 +38,6 @@ public class WsServerActor extends AbstractActor {
         Config config = system.settings().config();
         String hostname = config.getString("application.api.ip");
         int port = config.getInt("application.api.port");
-
         // Router
         Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =
                 routes.createRoute().flow(system, materializer);

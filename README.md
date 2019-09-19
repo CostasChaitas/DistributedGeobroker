@@ -26,6 +26,13 @@ In order that Kubernetes finds the locally published Docker image of our applica
 ```
 eval $(minikube docker-env)
 ```
+
+Create a Kubernetes namespace and set it as the current namespace: 
+```
+kubectl create namespace master-thesis-namespace
+kubectl config set-context --current --namespace=master-thesis-namespace
+```
+
 Build local Docker registry:
 ```
 mvn clean package docker:build
@@ -56,11 +63,13 @@ http://{{K8s_IP}}:{{Service_Port}}/cluster/members
 ws://{{K8s_IP}}:{{Service_Port}}/api
 ```
 
+In case you want you want to scale the number of Pods : 
 
+```
+kubectl scale --replicas=5 deployment/master-thesis
+```
 
-
-
-
-
-
-
+You can also configure auto scaling of the pods based on some criteria, e.g CPU utilization : 
+```
+kubectl autoscale deployment master-thesis --cpu-percent=50 --min=3 --max=10
+```

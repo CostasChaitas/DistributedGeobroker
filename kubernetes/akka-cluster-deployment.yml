@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: master-thesis
+  namespace: master-thesis-namespace
 spec:
   replicas: 3
   selector:
@@ -28,6 +29,10 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.podIP
+        - name: K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         ports:
         - name: remoting
           containerPort: 2552
