@@ -2,7 +2,7 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: master-thesis
-  namespace: default
+  namespace: master-thesis-namespace
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
