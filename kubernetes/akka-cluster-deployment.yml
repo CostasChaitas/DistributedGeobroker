@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: master-thesis
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: master-thesis-cluster
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: master-thesis-cluster
+    spec:
+      serviceAccountName: master-thesis-cluster
+      containers:
+      - image: master-thesis-cluster:1.0.0
+        imagePullPolicy: IfNotPresent
+        name: master-thesis-cluster
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        ports:
+        - name: remoting
+          containerPort: 2552
+        - name: api
+          containerPort: 8000
+        - name: management
+          containerPort: 8558
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20

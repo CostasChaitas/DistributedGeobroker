@@ -5,6 +5,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.cluster.sharding.ClusterSharding;
 import akka.cluster.sharding.ClusterShardingSettings;
+import akka.management.cluster.bootstrap.ClusterBootstrap;
 import akka.management.javadsl.AkkaManagement;
 import com.chaitas.masterthesis.Actors.WsServerActor;
 import com.chaitas.masterthesis.Sharding.ClientMessageExtractor;
@@ -18,7 +19,7 @@ public class Main {
 
     public static void main(String[] args) {
         Config baseConfig = ConfigFactory.load();
-        String actorSystemName = "clusterSystem";
+        String actorSystemName = "master-thesis-cluster";
         // If we have added ports on the command line, then override them in the config and start multiple actor systems
         if (args.length > 0) {
             // Check that we have an even number of ports, one remoting and one http for each actor system
@@ -30,9 +31,7 @@ public class Main {
                 String remoting = args[i];
                 String http = args[i + 1];
                 // Override the configuration of the port
-                Config config = ConfigFactory.parseString(
-                        "akka.remote.netty.tcp.port = " + remoting + "\n" +
-                                "application.api.port = " + http).withFallback(baseConfig);
+                Config config = ConfigFactory.parseString("akka.remote.netty.tcp.port = " + remoting);
                 createAndStartActorSystem(actorSystemName, config);
             }
         }
@@ -44,11 +43,11 @@ public class Main {
     private static void createAndStartActorSystem(String name, Config config) {
         // Create an Akka system
         ActorSystem system = ActorSystem.create(name, config);
-        // Start Akka management on the system
+        // Start Akka management and Cluster Bootstrap on the system
         AkkaManagement.get(system).start();
+        ClusterBootstrap.get(system).start();
         // Set up and start Cluster Sharding
         ClusterShardingSettings settings = ClusterShardingSettings.create(system);
-
         ActorRef clientShardRegion = ClusterSharding.get(system).start(
                 "Clients",
                 Props.create(ClientShardEntity.class),
