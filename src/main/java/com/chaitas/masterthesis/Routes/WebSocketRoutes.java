@@ -47,16 +47,10 @@ public class WebSocketRoutes extends AllDirectives {
                 path("api", () ->
                         get(() -> {
                             System.out.println("WsServerActor connection on route {/api} has been initiated." );
-                            Flow<Message, Message, NotUsed> flow = createFlowRoute();
-                            return handleWebSocketMessages(flow);
+                            return handleWebSocketMessages(createWebSocketFlow());
                         })
                 )
         );
-    }
-
-    private <T> Flow<Message, Message, NotUsed> createFlowRoute(){
-        final Flow<Message, Message, NotUsed> flow = createWebSocketFlow().watchTermination((nu, cd) -> nu);
-        return flow;
     }
 
     private Flow<Message, Message, NotUsed> createWebSocketFlow() {

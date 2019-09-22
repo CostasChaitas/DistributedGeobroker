@@ -16,7 +16,6 @@ import akka.stream.javadsl.Flow;
 import com.chaitas.masterthesis.Routes.WebSocketRoutes;
 import com.typesafe.config.Config;
 
-import java.net.UnknownHostException;
 import java.util.concurrent.CompletionStage;
 
 public class WsServerActor extends AbstractActor {

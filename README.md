@@ -37,6 +37,10 @@ Build local Docker registry:
 ```
 mvn clean package docker:build
 ```
+Define default's and limits for the cluster resources: 
+```
+kubectl create -f kubernetes/akka-cluster-limitrange.yml
+```
 Create serviceAccount and role :
 ```
 kubectl create -f kubernetes/akka-cluster-rbac.yml
@@ -77,7 +81,7 @@ kubectl autoscale deployment master-thesis --cpu-percent=50 --min=3 --max=10
 In order to see the loggings of the cluster :
 ```
 kubectl logs -l app=master-thesis-cluster
-kubectl logs -f deployment/master-thesis-cluster
+kubectl logs -f deployment/master-thesis
 ```
 
 Clean up :
