@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: master-thesis
-  namespace: master-thesis-namespace
+  name: distributed-geobroker
+  namespace: distributed-geobroker-namespace
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: master-thesis-cluster
+      app: distributed-geobroker
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -16,13 +16,13 @@ spec:
   template:
     metadata:
       labels:
-        app: master-thesis-cluster
+        app: distributed-geobroker
     spec:
-      serviceAccountName: master-thesis-cluster
+      serviceAccountName: distributed-geobroker
       containers:
-      - image: master-thesis-cluster:1.0.0
+      - image: distributed-geobroker:1.0.0
         imagePullPolicy: IfNotPresent
-        name: master-thesis-cluster
+        name: distributed-geobroker
         resources:
           requests:
             cpu: "0.3"

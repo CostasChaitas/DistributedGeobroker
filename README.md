@@ -9,8 +9,8 @@ This project/research is based on the [Geobroker project](https://github.com/Moe
 This is a Java, Maven and Akka project. Please install Java 8 and Maven 3.6.x
 
 ```
-git clone https://github.com/CostasChaitas/MasterThesis.git
-cd MasterThesis
+git clone https://github.com/CostasChaitas/DistributedGeobroker.git
+cd DistributedGeobroker
 mvn clean install
 ```
 The Maven command builds the project and creates a self contained runnable JAR.
@@ -29,8 +29,8 @@ eval $(minikube docker-env)
 
 Create a Kubernetes namespace and set it as the current namespace: 
 ```
-kubectl create namespace master-thesis-namespace
-kubectl config set-context --current --namespace=master-thesis-namespace
+kubectl create namespace distributed-geobroker-namespace
+kubectl config set-context --current --namespace=distributed-geobroker-namespace
 ```
 
 Build local Docker registry:
@@ -66,23 +66,23 @@ ws://{{K8s_IP}}:{{Service_Port}}/api
 In case you want you want to scale the number of Pods : 
 
 ```
-kubectl scale --replicas=5 deployment/master-thesis
+kubectl scale --replicas=5 deployment/distributed-geobroker
 ```
 
 You can also configure auto scaling of the pods based on some criteria, e.g CPU utilization : 
 ```
-kubectl autoscale deployment master-thesis --cpu-percent=50 --min=3 --max=10
+kubectl autoscale deployment distributed-geobroker --cpu-percent=50 --min=3 --max=10
 ```
 
 In order to see the loggings of the cluster :
 ```
-kubectl logs -l app=master-thesis-cluster
-kubectl logs -f deployment/master-thesis
+kubectl logs -l app=distributed-geobroker
+kubectl logs -f deployment/distributed-geobroker
 ```
 
 Clean up :
 ```
-kubectl delete namespace master-thesis-namespace
-kubectl delete clusterroles master-thesis-cluster
-kubectl delete clusterrolebindings master-thesis-cluster
+kubectl delete namespace distributed-geobroker-namespace
+kubectl delete clusterroles distributed-geobroker
+kubectl delete clusterrolebindings distributed-geobroker
 ```

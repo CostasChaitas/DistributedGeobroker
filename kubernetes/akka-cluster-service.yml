@@ -1,11 +1,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: master-thesis-cluster
+  name: distributed-geobroker
 spec:
   type: NodePort
   selector:
-    app: master-thesis-cluster
+    app: distributed-geobroker
   ports:
   - protocol: TCP
     name: management
