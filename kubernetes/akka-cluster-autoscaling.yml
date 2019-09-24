@@ -10,4 +10,4 @@ spec:
     name: distributed-geobroker
   minReplicas: 3
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 50
+  targetCPUUtilizationPercentage: 60

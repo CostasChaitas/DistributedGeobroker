@@ -20,12 +20,12 @@ spec:
     spec:
       serviceAccountName: distributed-geobroker
       containers:
-      - image: distributed-geobroker:1.0.0
+      - image: rasakos/distributed-geobroker:1.0.0
         imagePullPolicy: IfNotPresent
         name: distributed-geobroker
         resources:
           requests:
-            cpu: "0.3"
+            cpu: "0.5"
         env:
         - name: HOSTNAME
           valueFrom:
