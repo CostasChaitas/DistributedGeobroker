@@ -5,7 +5,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.chaitas</groupId>
-  <artifactId>MasterThesis</artifactId>
+  <artifactId>DistributedGeobroker</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <properties>
@@ -233,7 +233,7 @@
                 </transformer>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
-                    <Main-Class>com.chaitas.masterthesis.Main</Main-Class>
+                    <Main-Class>com.chaitas.distributed.geobroker.Main</Main-Class>
                   </manifestEntries>
                 </transformer>
               </transformers>
@@ -248,7 +248,7 @@
         <configuration>
           <images>
             <image>
-              <name>master-thesis-cluster:${docker.image.version}</name>
+              <name>distributed-geobroker:${docker.image.version}</name>
               <build>
                 <from>openjdk:8-jre-alpine</from>
                 <ports>
@@ -260,7 +260,7 @@
                   <exec>
                     <args>/bin/sh</args>
                     <args>-c</args>
-                    <args>java -jar /maven/MasterThesis.jar</args>
+                    <args>java -jar /maven/DistributedGeobroker.jar</args>
                   </exec>
                 </entryPoint>
                 <assembly>
@@ -269,9 +269,9 @@
                       <dependencySet>
                         <useProjectAttachments>true</useProjectAttachments>
                         <includes>
-                          <include>com.chaitas:MasterThesis:jar:allinone</include>
+                          <include>com.chaitas:DistributedGeobroker:jar:allinone</include>
                         </includes>
-                        <outputFileNameMapping>MasterThesis.jar</outputFileNameMapping>
+                        <outputFileNameMapping>DistributedGeobroker.jar</outputFileNameMapping>
                       </dependencySet>
                     </dependencySets>
                   </inline>

@@ -9,8 +9,8 @@ This project/research is based on the [Geobroker project](https://github.com/Moe
 This is a Java, Maven and Akka project. Please install Java 8 and Maven 3.6.x
 
 ```
-git clone https://github.com/CostasChaitas/MasterThesis.git
-cd MasterThesis
+git clone https://github.com/CostasChaitas/DistributedGeobroker.git
+cd DistributedGeobroker
 mvn clean install
 ```
 The Maven command builds the project and creates a self contained runnable JAR.
@@ -31,15 +31,15 @@ mvn exec:java -Dexec.mainClass=Main -Dexec.args="2553 8001" -pl Cluster
 A common way to run tests is to start single JVMs in multiple command windows. This simulates running a multi-node Akka cluster. For example, run the following 3 commands in 3 command windows.
 
 ```
-mvn exec:java -Dexec.mainClass="com.chaitas.masterthesis.Main" -Dexec.args="2552 8080"
+mvn exec:java -Dexec.mainClass="com.chaitas.distributed.geobroker.Main" -Dexec.args="2552 8080"
 ```
 
 ```
-mvn exec:java -Dexec.mainClass="com.chaitas.masterthesis.Main" -Dexec.args="2553 8001"
+mvn exec:java -Dexec.mainClass="com.chaitas.distributed.geobroker.Main" -Dexec.args="2553 8001"
 ```
 
 ```
-mvn exec:java -Dexec.mainClass="com.chaitas.masterthesis.Main" -Dexec.args="2554 8002"
+mvn exec:java -Dexec.mainClass="com.chaitas.distributed.geobroker.Main" -Dexec.args="2554 8002"
 ```
 
 To check the nodes and the status of the cluster you can use : 
@@ -70,7 +70,7 @@ mvn clean package docker:build
 
 Once the docker image is available, you can run the cluster using :
 ```
-docker-compose-up
+docker-compose up
 ```
 
 This will create 3 nodes, a seed and two regular members, called seed, node1, and node2 respectively. Below are listed the ports for each node.
