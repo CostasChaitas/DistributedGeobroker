@@ -23,6 +23,9 @@ spec:
       - image: master-thesis-cluster:1.0.0
         imagePullPolicy: IfNotPresent
         name: master-thesis-cluster
+        resources:
+          requests:
+            cpu: "0.3"
         env:
         - name: HOSTNAME
           valueFrom:
@@ -41,12 +44,14 @@ spec:
         - name: management
           containerPort: 8558
         readinessProbe:
-          tcpSocket:
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          httpGet:
+            path: "/ready"
+            port: management
+          initialDelaySeconds: 30
+          periodSeconds: 5
         livenessProbe:
-          tcpSocket:
-            port: 8000
-          initialDelaySeconds: 15
-          periodSeconds: 20
+          httpGet:
+            path: "/alive"
+            port: management
+          initialDelaySeconds: 60
+          periodSeconds: 10
