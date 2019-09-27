@@ -16,12 +16,12 @@ import akka.stream.javadsl.Source;
 import akka.util.ByteString;
 import com.chaitas.distributed.geobroker.Actors.WsClientActor;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ControlPacketType;
+import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ExternalMessage;
+import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Payloads.INCOMPATIBLEPayload;
+import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ReasonCode;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.OutgoingDestination;
 import com.chaitas.distributed.geobroker.Utils.JSONable;
 import com.chaitas.distributed.geobroker.Utils.KryoSerializer;
-import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ReasonCode;
-import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ExternalMessage;
-import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Payloads.INCOMPATIBLEPayload;
 
 import java.util.Optional;
 
@@ -47,10 +47,16 @@ public class WebSocketRoutes extends AllDirectives {
                 path("api", () ->
                         get(() -> {
                             System.out.println("WsServerActor connection on route {/api} has been initiated." );
-                            return handleWebSocketMessages(createWebSocketFlow());
+                            Flow<Message, Message, NotUsed> flow = createFlowRoute();
+                            return handleWebSocketMessages(flow);
                         })
                 )
         );
+    }
+
+    private <T> Flow<Message, Message, NotUsed> createFlowRoute(){
+        final Flow<Message, Message, NotUsed> flow = createWebSocketFlow().watchTermination((nu, cd) -> nu);
+        return flow;
     }
 
     private Flow<Message, Message, NotUsed> createWebSocketFlow() {
@@ -72,18 +78,18 @@ public class WebSocketRoutes extends AllDirectives {
         // Incoming messages
         Sink<Message, NotUsed> sink = Flow.<Message>create()
                 .map((msg) -> {
-                    // Message is Text
                     if(msg.isText()){
-                        System.out.print("Received a text message");
-                        Optional<ExternalMessage> message0 = JSONable.fromJSON(msg.asTextMessage().getStrictText(), ExternalMessage.class);
-                        if (message0.isPresent()) {
+                        // Message is Text
+                        try{
+                            System.out.print("Received a text message");
+                            Optional<ExternalMessage> message0 = JSONable.fromJSON(msg.asTextMessage().getStrictText(), ExternalMessage.class);
                             ExternalMessage message = message0.get();
                             return new ExternalMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
                             );
-                        } else {
+                        } catch(Exception e) {
                             System.out.println("Received an incompatible Text Message: +" + msg);
                             return new ExternalMessage(
                                     "404",
@@ -93,17 +99,17 @@ public class WebSocketRoutes extends AllDirectives {
                         }
                     } else{
                         // Message is Binary
-                        ByteString msg1 = msg.asBinaryMessage().getStrictData();
-                        byte[] arr = msg1.toArray();
-                        System.out.print("Received a binary message");
-                        ExternalMessage message = kryo.read(arr, ExternalMessage.class);
-                        if(message.getPayload() != null ) {
+                        try{
+                            System.out.print("Received a binary message");
+                            ByteString msg1 = msg.asBinaryMessage().getStrictData();
+                            byte[] arr = msg1.toArray();
+                            ExternalMessage message = kryo.read(arr, ExternalMessage.class);
                             return new ExternalMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
                             );
-                        }else{
+                        } catch(Exception e) {
                             System.out.println("Received an incompatible Binary Message: +" + msg);
                             return new ExternalMessage(
                                     "404",
@@ -119,7 +125,4 @@ public class WebSocketRoutes extends AllDirectives {
     }
 
 }
-
-
-
 

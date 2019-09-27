@@ -14,6 +14,5 @@ public enum ControlPacketType {
     UNSUBACK, //
     NOTCONNECTED, //
     CONNECTIONEXIST, //
-    MATCH, //
     INCOMPATIBLEPayload, //
 }

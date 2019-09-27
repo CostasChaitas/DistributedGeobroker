@@ -97,7 +97,7 @@ public class AkkaKryoInitializer {
         kryo.register(Subscription.class, 276);
         kryo.register(SendACK.class, 277);
         kryo.register(PublisherGeoMatching.class, 278);
-
+        kryo.register(Publish.class, 279);
     }
 
 }
