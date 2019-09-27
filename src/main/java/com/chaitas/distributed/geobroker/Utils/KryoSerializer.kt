@@ -211,7 +211,7 @@ class KryoSerializer {
                     ControlPacketType.SUBSCRIBE -> kryo.writeObjectOrNull(output, o.payload, SUBSCRIBEPayload::class.java)
                     ControlPacketType.UNSUBACK -> kryo.writeObjectOrNull(output, o.payload, UNSUBACKPayload::class.java)
                     ControlPacketType.UNSUBSCRIBE -> kryo.writeObjectOrNull(output, o.payload, UNSUBSCRIBEPayload::class.java)
-                    ControlPacketType.INCOMPATIBLEPayload -> kryo.readObjectOrNull(input, INCOMPATIBLEPayload::class.java)
+                    ControlPacketType.INCOMPATIBLEPayload -> kryo.writeObjectOrNull(output, o.payload, INCOMPATIBLEPayload::class.java)
                 }
             }
 
