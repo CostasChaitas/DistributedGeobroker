@@ -21,7 +21,7 @@ import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Payloads.INCO
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ReasonCode;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.OutgoingDestination;
 import com.chaitas.distributed.geobroker.Utils.JSONable;
-import com.chaitas.distributed.geobroker.Utils.KryoThreadSafe;
+import com.chaitas.distributed.geobroker.Utils.KryoSerializerPool;
 
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class WebSocketRoutes extends AllDirectives {
 
     private final ActorSystem system;
     private final ActorRef clientShardRegion;
-    private KryoThreadSafe kryo = new KryoThreadSafe();
+    private KryoSerializerPool kryo = new KryoSerializerPool();
 
     public WebSocketRoutes(ActorSystem system, ActorRef clientShardRegion) {
         this.system = system;
