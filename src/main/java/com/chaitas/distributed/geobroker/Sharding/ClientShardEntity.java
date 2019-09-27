@@ -266,11 +266,12 @@ public class ClientShardEntity extends AbstractActor {
         if(isPublisherGeoMatching){
             ExternalMessage externalMessage = new ExternalMessage(
                     publisherGeoMatching.publication.message.getClientIdentifier(),
-                    ControlPacketType.MATCH,
+                    ControlPacketType.PUBLISH,
                     publisherGeoMatching.publication.message.getPayload().getPUBLISHPayload()
             );
+            Publish publish = new Publish(externalMessage);
             log.info("Sending MATCH message to " + wsClientActor);
-            wsClientActor.tell(externalMessage, getSelf());
+            wsClientActor.tell(publish, getSelf());
         }
     }
 

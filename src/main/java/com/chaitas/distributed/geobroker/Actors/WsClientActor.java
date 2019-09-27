@@ -41,6 +41,7 @@ public class WsClientActor extends AbstractActor {
             .match(OutgoingDestination.class, message -> receiveOutgoingDestination(message))
             // Incoming from Sharding Entity - ClientShardEntity
             .match(SendACK.class, message-> receiveSendACK(message))
+            .match(Publish.class, message-> receivePublish(message))
             .build();
     }
 
@@ -103,13 +104,6 @@ public class WsClientActor extends AbstractActor {
                         clientShardRegion.tell(processPUBLISH, getSelf());
                     }
                     break;
-                case MATCH:
-                    PUBLISHPayload publishPayload1 = message.getPayload().getPUBLISHPayload();
-                    if (publishPayload1 != null) {
-                        log.info("WsClientActor {} received message MATCH", wsClientActorId);
-                        outgoing.tell(message, getSelf());
-                    }
-                    break;
                 default:
                     log.info("WsClientActor {} received message INCOMPATIBLE", wsClientActorId);
                     ExternalMessage externalMessage = new ExternalMessage(
@@ -125,6 +119,11 @@ public class WsClientActor extends AbstractActor {
     private void receiveSendACK(SendACK sendACK) {
         log.info("WsClientActor {} received message SendACK", wsClientActorId);
         outgoing.tell(sendACK.message, getSender());
+    }
+
+    private void receivePublish(Publish publish) {
+        log.info("WsClientActor {} received message Publish", wsClientActorId);
+        outgoing.tell(publish.message, getSender());
     }
 
     private void receiveOutgoingDestination(OutgoingDestination message) {

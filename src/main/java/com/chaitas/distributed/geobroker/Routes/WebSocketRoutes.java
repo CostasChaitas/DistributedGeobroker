@@ -78,18 +78,18 @@ public class WebSocketRoutes extends AllDirectives {
         // Incoming messages
         Sink<Message, NotUsed> sink = Flow.<Message>create()
                 .map((msg) -> {
-                    // Message is Text
                     if(msg.isText()){
-                        System.out.print("Received a text message");
-                        Optional<ExternalMessage> message0 = JSONable.fromJSON(msg.asTextMessage().getStrictText(), ExternalMessage.class);
-                        if (message0.isPresent()) {
+                        // Message is Text
+                        try{
+                            System.out.print("Received a text message");
+                            Optional<ExternalMessage> message0 = JSONable.fromJSON(msg.asTextMessage().getStrictText(), ExternalMessage.class);
                             ExternalMessage message = message0.get();
                             return new ExternalMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
                             );
-                        } else {
+                        } catch(Exception e) {
                             System.out.println("Received an incompatible Text Message: +" + msg);
                             return new ExternalMessage(
                                     "404",
@@ -99,17 +99,17 @@ public class WebSocketRoutes extends AllDirectives {
                         }
                     } else{
                         // Message is Binary
-                        ByteString msg1 = msg.asBinaryMessage().getStrictData();
-                        byte[] arr = msg1.toArray();
-                        System.out.print("Received a binary message");
-                        ExternalMessage message = kryo.read(arr, ExternalMessage.class);
-                        if(message.getPayload() != null ) {
+                        try{
+                            System.out.print("Received a binary message");
+                            ByteString msg1 = msg.asBinaryMessage().getStrictData();
+                            byte[] arr = msg1.toArray();
+                            ExternalMessage message = kryo.read(arr, ExternalMessage.class);
                             return new ExternalMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
                             );
-                        }else{
+                        } catch(Exception e) {
                             System.out.println("Received an incompatible Binary Message: +" + msg);
                             return new ExternalMessage(
                                     "404",
