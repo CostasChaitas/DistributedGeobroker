@@ -26,8 +26,7 @@ public class KryoSerializerPool {
 
             Kryo kryo = new Kryo();
 
-            kryo.register(Topic.class, new Serializer<Topic>(){
-
+            kryo.register(Topic.class, new Serializer<Topic>() {
                 public void write (Kryo kryo, Output output, Topic object) {
                     kryo.writeObjectOrNull(output, object.getTopic(), String.class);
                 }
