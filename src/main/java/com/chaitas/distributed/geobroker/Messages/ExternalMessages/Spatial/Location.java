@@ -2,7 +2,7 @@
 
 package com.chaitas.distributed.geobroker.Messages.ExternalMessages.Spatial;
 
-import com.chaitas.distributed.geobroker.Utils.UtilityKt;
+import com.chaitas.distributed.geobroker.Messages.ExternalMessages.UtilityKt;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;

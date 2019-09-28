@@ -1,4 +1,4 @@
-package com.chaitas.distributed.geobroker.Utils
+package com.chaitas.distributed.geobroker.Messages.ExternalMessages
 
 import java.util.*
 
