@@ -152,7 +152,7 @@ public class Location {
         return point.getLon();
     }
 
-    public String getWKTString() {
+    public String getWKT() {
         if (undefined) {
             return "{ undefined }";
         }
@@ -167,7 +167,7 @@ public class Location {
 
     @Override
     public String toString() {
-        return getWKTString();
+        return getWKT();
     }
 
     /*****************************************************************

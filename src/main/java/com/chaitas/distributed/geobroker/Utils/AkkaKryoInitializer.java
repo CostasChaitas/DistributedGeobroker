@@ -56,7 +56,7 @@ public class AkkaKryoInitializer {
 
         kryo.register(Geofence.class, new Serializer<Geofence>() {
             public void write (Kryo kryo, Output output, Geofence object) {
-                kryo.writeObjectOrNull(output, object.getWKTString(), String.class);
+                kryo.writeObjectOrNull(output, object.getWKT(), String.class);
             }
 
             public Geofence read (Kryo kryo, Input input, Class<Geofence> type) {

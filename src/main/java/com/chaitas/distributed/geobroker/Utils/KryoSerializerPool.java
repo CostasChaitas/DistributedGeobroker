@@ -61,13 +61,13 @@ public class KryoSerializerPool {
 
             kryo.register(Geofence.class, new Serializer<Geofence>() {
                 public void write (Kryo kryo, Output output, Geofence object) {
-                    kryo.writeObjectOrNull(output, object.getWKTString(), String.class);
+                    kryo.writeObjectOrNull(output, object.getWKT(), String.class);
                 }
 
                 public Geofence read (Kryo kryo, Input input, Class<Geofence> type) {
                     try {
-                        String wktString = kryo.readObjectOrNull(input, String.class);
-                        return new Geofence(wktString);
+                        String wkt = kryo.readObjectOrNull(input, String.class);
+                        return new Geofence(wkt);
                     } catch (Exception ex) {
                         throw new Error(ex);
                     }
