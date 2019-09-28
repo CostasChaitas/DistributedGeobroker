@@ -21,7 +21,7 @@ import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Payloads.INCO
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ReasonCode;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.OutgoingDestination;
 import com.chaitas.distributed.geobroker.Utils.JSONable;
-import com.chaitas.distributed.geobroker.Utils.KryoSerializer;
+import com.chaitas.distributed.geobroker.Utils.KryoSerializerPool;
 
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class WebSocketRoutes extends AllDirectives {
 
     private final ActorSystem system;
     private final ActorRef clientShardRegion;
-    private KryoSerializer kryo = new KryoSerializer();
+    private KryoSerializerPool kryo = new KryoSerializerPool();
 
     public WebSocketRoutes(ActorSystem system, ActorRef clientShardRegion) {
         this.system = system;
@@ -103,7 +103,7 @@ public class WebSocketRoutes extends AllDirectives {
                             System.out.print("Received a binary message");
                             ByteString msg1 = msg.asBinaryMessage().getStrictData();
                             byte[] arr = msg1.toArray();
-                            ExternalMessage message = kryo.read(arr, ExternalMessage.class);
+                            ExternalMessage message = (ExternalMessage) kryo.read(arr, ExternalMessage.class);
                             return new ExternalMessage(
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
