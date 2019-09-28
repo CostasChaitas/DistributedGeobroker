@@ -2,6 +2,7 @@
 
 package com.chaitas.distributed.geobroker.Messages.ExternalMessages.Spatial;
 
+import com.chaitas.distributed.geobroker.Messages.ExternalMessages.UtilityKt;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
@@ -50,6 +51,31 @@ public class Location {
     @JsonIgnore
     public static Location undefined() {
         return new Location(true);
+    }
+
+    /**
+     * Creates a random location that is inside the given Geofence.
+     *
+     * @param geofence - may not be a geofence that crosses any datelines!!
+     * @return a random location or null if the geofence crosses a dateline
+     */
+    public static Location randomInGeofence(Geofence geofence) {
+        Location result = null;
+        int i = 0;
+        do {
+            // generate lat in bounding box
+            double lat = UtilityKt.randomDouble(geofence.getBoundingBoxSouthWest().getLat(),
+                    geofence.getBoundingBoxNorthEast().getLat());
+
+            // generate lon in bounding box
+            double lon = UtilityKt.randomDouble(geofence.getBoundingBoxSouthWest().getLon(),
+                    geofence.getBoundingBoxNorthEast().getLon());
+
+            // create location and hope it is in geofence
+            result = new Location(lat, lon);
+        } while (!geofence.contains(result) && ++i < 1000);
+        // location was in geofence, so let's return it
+        return result;
     }
 
     /**
@@ -126,7 +152,7 @@ public class Location {
         return point.getLon();
     }
 
-    public String getWKTString() {
+    public String getWKT() {
         if (undefined) {
             return "{ undefined }";
         }
@@ -141,7 +167,7 @@ public class Location {
 
     @Override
     public String toString() {
-        return getWKTString();
+        return getWKT();
     }
 
     /*****************************************************************

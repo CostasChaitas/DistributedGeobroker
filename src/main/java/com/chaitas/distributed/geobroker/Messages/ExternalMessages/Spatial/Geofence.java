@@ -35,7 +35,7 @@ public class Geofence{
         this.boundingBox = shape.getBoundingBox();
     }
 
-    public Geofence(@NotNull @JsonProperty("WKT") String wkt) throws ParseException {
+    public Geofence(@NotNull @JsonProperty("wkt") String wkt) throws ParseException {
         WKTReader reader = (WKTReader) GEO.getFormats().getWktReader();
         this.shape = reader.parse(wkt);
         this.boundingBox = this.shape.getBoundingBox();
@@ -149,14 +149,14 @@ public class Geofence{
         return this.shape;
     }
 
-    public String getWKTString() {
+    public String getWKT() {
         ShapeWriter writer = GEO.getFormats().getWktWriter();
         return writer.toString(shape);
     }
 
     @Override
     public String toString() {
-        return getWKTString();
+        return getWKT();
     }
 
     /*****************************************************************

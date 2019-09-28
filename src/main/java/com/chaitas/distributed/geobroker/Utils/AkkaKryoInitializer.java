@@ -3,13 +3,13 @@ package com.chaitas.distributed.geobroker.Utils;
 import akka.actor.ActorRef;
 import akka.actor.FunctionRef;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ControlPacketType;
+import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ExternalMessage;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Payloads.*;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ReasonCode;
-import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ExternalMessage;
-import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Topic;
-import com.chaitas.distributed.geobroker.Messages.InternalMessages.*;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Spatial.Geofence;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Spatial.Location;
+import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Topic;
+import com.chaitas.distributed.geobroker.Messages.InternalMessages.*;
 import com.chaitas.distributed.geobroker.Storage.Subscription;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
@@ -56,7 +56,7 @@ public class AkkaKryoInitializer {
 
         kryo.register(Geofence.class, new Serializer<Geofence>() {
             public void write (Kryo kryo, Output output, Geofence object) {
-                kryo.writeObjectOrNull(output, object.getWKTString(), String.class);
+                kryo.writeObjectOrNull(output, object.getWKT(), String.class);
             }
 
             public Geofence read (Kryo kryo, Input input, Class<Geofence> type) {
@@ -98,6 +98,7 @@ public class AkkaKryoInitializer {
         kryo.register(SendACK.class, 277);
         kryo.register(PublisherGeoMatching.class, 278);
         kryo.register(Publish.class, 279);
+
     }
 
 }
