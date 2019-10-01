@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  tasks:
+    - pip:
+        name: openshift
+        
+    - name: create namespaces
+      k8s:
+        state: present
+        src: ./namespaces/cluster-namespaces.yaml
+
+    - name: create roles
+      k8s:
+        state: present
+        src: ./cluster-role-binding.yaml
+
+    - name: Launch the cluster deployment
+      k8s:
+        state: present
+        src: ./cluster/cluster-deployment.yaml
+    
+    - name: create cluster service
+      k8s:
+        state: present
+        src: ./cluster/cluster-service.yaml

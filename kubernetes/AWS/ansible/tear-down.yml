@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  tasks:
+    - pip:
+        name: openshift
+
+    - name: create roles
+      k8s:
+        state: absent
+        src: ./cluster-role-binding.yaml
+
+    - name: create the backend namespace
+      k8s:
+        state: absent
+        src: ./namespaces/cluster-namespaces.yaml
+      
+    - name: Launch the backend deployment
+      k8s:
+        state: absent
+        src: ./cluster/cluster-deployment.yaml
+    
+    - name: create backend service
+      k8s:
+        state: absent
+        src: ./cluster/cluster-service.yaml

@@ -1,0 +1,25 @@
+#!/bin/bash 
+
+cd /terraformEKS
+
+terraform init
+
+terraform plan
+
+terraform apply -auto-approve
+
+cd /config-files
+
+mv config ~/.kube/config
+
+kubectl apply -f nodes.yaml
+
+cd ../
+
+cd ../
+
+cd /ansible
+
+ansible-playbook full-set-up.yaml
+
+kubectl get svc
