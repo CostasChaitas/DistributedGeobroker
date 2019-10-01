@@ -2,7 +2,9 @@
  
 ## Title: Design and Implementation of a Scalable, Distributed, Location-Based Pub/Sub System
 
-This project/research is based on the [Geobroker project](https://github.com/MoeweX/geobroker) from Jonathan Hasenburg.
+The evaluation of this project can be found in the [DistributedGeobrokerEvaluation](https://github.com/CostasChaitas/DistributedGeobrokerEvaluation) project.
+
+This project/research is based on the [Geobroker](https://github.com/MoeweX/geobroker) project from Jonathan Hasenburg.
 
 ## Installation
 
