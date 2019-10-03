@@ -1,7 +1,7 @@
 # Variables Configuration
 
 variable "cluster-name" {
-  default     = "distributed-geobroker-cluster"
+  default     = "distributed-geobroker-thesis"
   type        = "string"
   description = "The name of your EKS Cluster"
 }
@@ -37,7 +37,7 @@ variable "desired-capacity" {
 }
 
 variable "max-size" {
-  default     = 6
+  default     = 5
   type        = "string"
   description = "Autoscaling maximum node capacity"
 }

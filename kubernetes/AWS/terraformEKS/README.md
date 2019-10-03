@@ -33,13 +33,6 @@ You can configure you config with the following input variables:
 
 > You can create a file called terraform.tfvars in the project root, to place your variables if you would like to over-ride the defaults.
 
-## How to use this example
-
-```bash
-git clone git@github.com:WesleyCharlesBlake/terraform-aws-eks.git
-cd terraform-aws-eks
-```
-
 ## Remote Terraform Module
 
 You can use this module from the Terraform registry as a remote source:
@@ -104,7 +97,7 @@ terraform apply
 
 > TIP: you should save the plan state `terraform plan -out eks-state` or even better yet, setup [remote storage](https://www.terraform.io/docs/state/remote.html) for Terraform state. You can store state in an [S3 backend](https://www.terraform.io/docs/backends/types/s3.html), with locking via DynamoDB
 
-### Setup kubectl
+### Configure kubectl for EKS
 
 Setup your `KUBECONFIG`
 
@@ -119,11 +112,6 @@ Get the config from terraform output, and save it to a yaml file:
 
 ```bash
 terraform output config-map > config-map-aws-auth.yaml
-```
-
-Configure kubectl for EKS
-```bash
-aws eks --region eu-central-1 update-kubeconfig --name distributed-geobroker-cluster
 ```
 
 Apply the config map to EKS:

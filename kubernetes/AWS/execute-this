@@ -8,13 +8,11 @@ terraform plan
 
 terraform apply -auto-approve
 
-cd /config-files
+aws eks --region eu-central-1 update-kubeconfig --name distributed-geobroker-cluster
 
-mv config ~/.kube/config
+terraform output config-map > config-map-aws-auth.yaml
 
-kubectl apply -f nodes.yaml
-
-cd ../
+kubectl apply -f config-map-aws-auth.yaml
 
 cd ../
 

@@ -4,22 +4,40 @@
     - pip:
         name: openshift
 
-    - name: create roles
+    - name: delete namespace roles
       k8s:
         state: absent
-        src: ./cluster-role-binding.yaml
+        src: ./roles/cluster-role-binding-namespace.yaml
 
-    - name: create the backend namespace
+    - name: delete default roles
+      k8s:
+        state: absent
+        src: ./roles/cluster-role-binding-default.yaml
+
+    - name: delete the cluster namespace
       k8s:
         state: absent
         src: ./namespaces/cluster-namespaces.yaml
       
-    - name: Launch the backend deployment
+    - name: delete the cluster deployment
       k8s:
         state: absent
         src: ./cluster/cluster-deployment.yaml
     
-    - name: create backend service
+    - name: delete cluster service
       k8s:
         state: absent
         src: ./cluster/cluster-service.yaml
+
+    # Remove Kubernetes metrics-server and Dashboard(UI)
+
+    - name: Update metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+      lineinfile:
+        dest: metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+        line: "{{ item }}"
+        state: absent
+
+    - name: Remove metrics-server repo
+      file:
+        path: ./metrics-server
+        state: absent

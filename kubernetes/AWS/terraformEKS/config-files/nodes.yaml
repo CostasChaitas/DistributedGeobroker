@@ -1,3 +1,4 @@
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -5,7 +6,7 @@ metadata:
   namespace: kube-system
 data:
   mapRoles: |
-    - rolearn: arn:aws:iam::703170551811:role/my-cluster-eks-node-role
+    - rolearn: arn:aws:iam::746022503515:role/distributed-geobroker-thesis-eks-node-role
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers

@@ -2,6 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: distributed-geobroker
+  namespace: distributed-geobroker-namespace
 spec:
   type: LoadBalancer
   selector:
