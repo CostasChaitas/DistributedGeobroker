@@ -23,21 +23,13 @@
       k8s:
         state: absent
         src: ./cluster/cluster-deployment.yaml
+
+    - name: delete pod autoscaling
+      k8s:
+        state: absent
+        src: ./autoscaling/autoscaling.yaml
     
     - name: delete cluster service
       k8s:
         state: absent
         src: ./cluster/cluster-service.yaml
-
-    # Remove Kubernetes metrics-server and Dashboard(UI)
-
-    - name: Update metrics-server/deploy/1.8+/metrics-server-deployment.yaml
-      lineinfile:
-        dest: metrics-server/deploy/1.8+/metrics-server-deployment.yaml
-        line: "{{ item }}"
-        state: absent
-
-    - name: Remove metrics-server repo
-      file:
-        path: ./metrics-server
-        state: absent

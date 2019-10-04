@@ -20,7 +20,7 @@ spec:
     spec:
       serviceAccountName: distributed-geobroker
       containers:
-      - image: rasakos/distributed-geobroker:1.0.0
+      - image: rasakos/distributed-geobroker:1.1.0
         imagePullPolicy: IfNotPresent
         name: distributed-geobroker
         resources:

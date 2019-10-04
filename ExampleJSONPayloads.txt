@@ -30,7 +30,7 @@ SUBSCRIBEPayload
       "@payloadType": "SUBSCRIBEPayload",
       "topic": "test",
       "geofence" : {
-        "WKT" : "POLYGON((4.7 53.1, 24.7 53.1, 24.7 42.2, 4.7 42.2,4.7 53.1))"
+        "wkt" : "POLYGON((4.7 53.1, 24.7 53.1, 24.7 42.2, 4.7 42.2,4.7 53.1))"
       }
   },
 	"controlPacketType": "SUBSCRIBE",
@@ -53,7 +53,7 @@ PUBLISHPayload
       "@payloadType": "PUBLISHPayload",
       "topic": "test",
       "geofence" : {
-        "WKT" : "POLYGON((4.7 53.1, 24.7 53.1, 24.7 42.2, 4.7 42.2,4.7 53.1))"
+        "wkt" : "POLYGON((4.7 53.1, 24.7 53.1, 24.7 42.2, 4.7 42.2,4.7 53.1))"
       },
       "content": "yo2oo"
   },
