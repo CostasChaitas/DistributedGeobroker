@@ -2,7 +2,7 @@
 # Workstation External IP
 
 data "http" "workstation-external-ip" {
-  url = "http://whatismyip.akamai.com/"
+  url = "http://icanhazip.com"
 }
 
 locals {
