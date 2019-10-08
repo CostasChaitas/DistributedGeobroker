@@ -66,6 +66,16 @@ resource "aws_security_group_rule" "cluster-ingress-workstation-https" {
   type              = "ingress"
 }
 
+resource "aws_security_group_rule" "kube-masters-04" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "6"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.cluster.id}"
+}
+
+
 resource "aws_eks_cluster" "eks" {
   name     = "${var.cluster-name}"
   role_arn = "${aws_iam_role.cluster.arn}"
