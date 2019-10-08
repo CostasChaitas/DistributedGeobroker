@@ -103,6 +103,7 @@ Setup your `KUBECONFIG`
 
 ```bash
 terraform output kubeconfig > ~/.kube/eks-cluster
+terraform output kubeconfig > ~/.kube/config
 export KUBECONFIG=~/.kube/eks-cluster
 ```
 
