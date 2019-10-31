@@ -10,7 +10,7 @@ This project/research is based on the [Geobroker](https://github.com/MoeweX/geob
 
 This project is aimed to be deployed in a Kubernetes environment on AWS EKS, using Docker images. If you want to use the project locally, please move to the **local** branch and follow the instructions.
 
-In order to build the Docker registry from this project, please install Java 8 and Maven 3.6.x. Then run the following commands: 
+In order to build the Docker registry from this project, please install Java 8 and Maven 3.6.x and Docker. Then run the following commands: 
 
 ```
 git clone https://github.com/CostasChaitas/DistributedGeobroker.git

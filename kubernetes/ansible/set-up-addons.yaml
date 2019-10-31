@@ -7,6 +7,13 @@
         repo: "https://github.com/kubernetes-incubator/metrics-server.git"
         dest: metrics-server
 
+    - name: "Remove runAsNonRoot from metrics deployment"
+      lineinfile:
+        dest: metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+        regexp: "runAsNonRoot: true"
+        state: absent
+      register: example1out
+
     - name: Update metrics-server/deploy/1.8+/metrics-server-deployment.yaml
       lineinfile:
         dest: metrics-server/deploy/1.8+/metrics-server-deployment.yaml

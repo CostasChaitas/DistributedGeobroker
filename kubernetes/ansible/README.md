@@ -23,9 +23,14 @@ In order to deploy the general tools listed above, run the following command:
 sudo ansible-playbook set-up-addons.yaml
 ```
 
-In order to deploy the application, please specify the desired Docker image in the **./cluster/cluster-deployment.yaml** file. Then, run the following command: 
+In order to deploy the application run the following command: 
 ```
 sudo ansible-playbook full-set-up.yaml
+```
+
+In order to deploy the monitoring system run the following command: 
+```
+sudo ansible-playbook set-up-monitoring.yaml
 ```
 
 ## Access the Kubernetes dashboard

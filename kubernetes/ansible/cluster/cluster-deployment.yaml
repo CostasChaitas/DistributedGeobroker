@@ -4,7 +4,7 @@ metadata:
   name: distributed-geobroker
   namespace: distributed-geobroker-namespace
 spec:
-  replicas: 5
+  replicas: 10
   selector:
     matchLabels:
       app: distributed-geobroker
@@ -25,7 +25,7 @@ spec:
         name: distributed-geobroker
         resources:
           requests:
-            cpu: "0.5"
+            cpu: "20m"
         env:
         - name: HOSTNAME
           valueFrom:

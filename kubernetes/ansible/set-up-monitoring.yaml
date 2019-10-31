@@ -8,8 +8,8 @@
       shell: kubectl create clusterrolebinding tiller --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 
     - name: Initlialize service account for monitoring
-      shell: helm init --service-account tiller
+      shell: helm init --service-account tiller --wait
 
     - name: Install Monitoring
-      shell: helm install --name prometheus stable/prometheus-operator
+      shell: helm install --namespace monitoring --name prometheus stable/prometheus-operator
 

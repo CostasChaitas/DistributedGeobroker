@@ -13,7 +13,7 @@ variable "aws-region" {
 }
 
 variable "k8s-version" {
-  default     = "1.11"
+  default     = "1.14"
   type        = "string"
   description = "Required K8s version"
 }
@@ -25,13 +25,13 @@ variable "vpc-subnet-cidr" {
 }
 
 variable "node-instance-type" {
-  default     = "t2.medium"
+  default     = "t3.large"
   type        = "string"
   description = "Worker Node EC2 instance type"
 }
 
 variable "desired-capacity" {
-  default     = 4
+  default     = 1
   type        = "string"
   description = "Autoscaling Desired node capacity"
 }
@@ -43,7 +43,7 @@ variable "max-size" {
 }
 
 variable "min-size" {
-  default     = 3
+  default     = 1
   type        = "string"
   description = "Autoscaling Minimum node capacity"
 }
