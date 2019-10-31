@@ -72,8 +72,5 @@ fun generatePayloadWithSize(payloadSize: Int, content: String): String {
         stringBuilder.append("a")
     }
     return stringBuilder.toString()
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> kubernetes
+

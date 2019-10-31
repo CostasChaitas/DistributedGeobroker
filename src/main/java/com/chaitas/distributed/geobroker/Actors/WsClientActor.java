@@ -4,15 +4,9 @@ import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ControlPacketType;
-<<<<<<< HEAD:src/main/java/com/chaitas/distributed/geobroker/Actors/WsClientActor.java
-import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ExternalMessage;
-import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Payloads.*;
-import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ReasonCode;
-=======
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Payloads.*;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ReasonCode;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ExternalMessage;
->>>>>>> kubernetes:src/main/java/com/chaitas/distributed/geobroker/Actors/WsClientActor.java
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.*;
 
 public class WsClientActor extends AbstractActor {

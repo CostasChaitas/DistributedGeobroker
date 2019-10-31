@@ -5,19 +5,11 @@ import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
-<<<<<<< HEAD:src/main/java/com/chaitas/distributed/geobroker/Sharding/TopicShardEntity.java
-import com.chaitas.distributed.geobroker.Messages.InternalMessages.PublisherGeoMatching;
-import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessPUBLISH;
-import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessSUBSCRIBE;
-import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessUNSUBSCRIBE;
-import com.chaitas.distributed.geobroker.Storage.Raster;
-=======
 import com.chaitas.distributed.geobroker.Storage.Raster;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessPUBLISH;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessSUBSCRIBE;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessUNSUBSCRIBE;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.PublisherGeoMatching;
->>>>>>> kubernetes:src/main/java/com/chaitas/distributed/geobroker/Sharding/TopicShardEntity.java
 import com.chaitas.distributed.geobroker.Storage.Subscription;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
