@@ -22,12 +22,12 @@ The Maven command builds the project and creates a self contained runnable JAR.
 The following Maven command runs a single JVM with 1 Akka actor system on port 2551. Each actor system creates an actor for the HTTP API by default on port 8080.
 
 ```
-mvn exec:java -Dexec.mainClass=Main -pl Server
+mvn exec:java -Dexec.mainClass="com.chaitas.distributed.geobroker.Main"
 ```
 
 To run on specific ports use the following -D option for passing in command line arguements(You need to pass one parameter for the actor system port and one paraemeter for the HTTP API port).
 ```
-mvn exec:java -Dexec.mainClass=Main -Dexec.args="2553 8001" -pl Cluster
+mvn exec:java -Dexec.mainClass="com.chaitas.distributed.geobroker.Main" -Dexec.args="2552 8000"
 ```
 
 A common way to run tests is to start single JVMs in multiple command windows. This simulates running a multi-node Akka cluster. For example, run the following 3 commands in 3 command windows.
