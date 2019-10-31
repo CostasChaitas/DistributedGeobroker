@@ -17,7 +17,7 @@ Deploy a full AWS EKS cluster with Terraform
 
 ## Configuration
 
-You can configure you config with the following input variables:
+You can configure the properties of the EKS Kubernetes cluster using  **./variables.tf** file:
 
 | Name                 | Description                       | Default       |
 |----------------------|-----------------------------------|---------------|
@@ -31,59 +31,6 @@ You can configure you config with the following input variables:
 | `vpc-subnet-cidr`    | Subnet CIDR                       | `10.0.0.0/16` |
 
 
-> You can create a file called terraform.tfvars in the project root, to place your variables if you would like to over-ride the defaults.
-
-## Remote Terraform Module
-
-You can use this module from the Terraform registry as a remote source:
-
-```bash
-module "module" {
-  source  = "WesleyCharlesBlake/eks/aws"
-  version = "1.0.5"
-
-  cluster-name       = "${var.cluster-name}"
-  aws-region         = "${var.aws-region}"
-  k8s-version        = "${var.k8s-version}"
-  node-instance-type = "${var.node-instance-type}"
-  desired-capacity   = "${var.desired-capacity}"
-  max-size           = "${var.max-size}"
-  min-size           = "${var.min-size}"
-  vpc-subnet-cidr    = "${var.vpc-subnet-cidr}"
-}
-```
-
-### IAM
-
-The AWS credentials must be associated with a user having at least the following AWS managed IAM policies
-
-* IAMFullAccess
-* AutoScalingFullAccess
-* AmazonEKSClusterPolicy
-* AmazonEKSWorkerNodePolicy
-* AmazonVPCFullAccess
-* AmazonEKSServicePolicy
-* AmazonEKS_CNI_Policy
-* AmazonEC2FullAccess
-
-In addition, you will need to create the following managed policies
-
-*EKS*
-
-```
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "eks:*"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-```
 
 ### Terraform
 
