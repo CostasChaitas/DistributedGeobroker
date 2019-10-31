@@ -6,12 +6,12 @@
     </clients>
 
     <servers>
-        <server host="localhost" port="8000" type="tcp" />
+        <server host="a010ccb12e9fc11e9bc8102a4f2de90f-1850684300.eu-central-1.elb.amazonaws.com" port="8000" type="tcp" />
     </servers>
 
     <load>
-        <arrivalphase phase="1" duration="100" unit="second">
-            <users maxnumber="100000" arrivalrate="1000" unit="second" />
+        <arrivalphase phase="1" duration="2" unit="minute">
+            <users maxnumber="60000" arrivalrate="50" unit="second" />
         </arrivalphase>
     </load>
 
