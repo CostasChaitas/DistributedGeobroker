@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: distributed-geobroker
+  namespace: distributed-geobroker-namespace
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: distributed-geobroker
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: distributed-geobroker
+    spec:
+      serviceAccountName: distributed-geobroker
+      containers:
+      - image: rasakos/distributed-geobroker:1.1.0
+        imagePullPolicy: IfNotPresent
+        name: distributed-geobroker
+        resources:
+          requests:
+            cpu: "0.5"
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        ports:
+        - name: remoting
+          containerPort: 2552
+        - name: api
+          containerPort: 8000
+        - name: management
+          containerPort: 8558
+        readinessProbe:
+          httpGet:
+            path: "/ready"
+            port: management
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: "/alive"
+            port: management
+          initialDelaySeconds: 60
+          periodSeconds: 10

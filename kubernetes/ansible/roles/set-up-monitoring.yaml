@@ -1,0 +1,17 @@
+
+
+
+
+
+#Install Prometheus and Grafana monitoring
+- name: Create service account for monitoring
+  shell: kubectl create serviceaccount tiller --namespace kube-system
+
+- name: Create cluster role binding for monitoring
+  shell: kubectl create clusterrolebinding tiller --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+
+- name: Initlialize service account for monitoring
+  shell: helm init --service-account tiller
+
+- name: Install Monitoring
+  shell: helm install --name prometheus stable/prometheus-operator

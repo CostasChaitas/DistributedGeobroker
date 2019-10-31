@@ -331,4 +331,8 @@ public class KryoSerializerPool {
         return obj;
     }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> kubernetes

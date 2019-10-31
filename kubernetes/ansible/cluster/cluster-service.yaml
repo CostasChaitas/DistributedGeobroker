@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: distributed-geobroker
+  namespace: distributed-geobroker-namespace
+spec:
+  type: LoadBalancer
+  selector:
+    app: distributed-geobroker
+  ports:
+  - protocol: TCP
+    name: management
+    port: 8558
+    targetPort: management
+  - protocol: TCP
+    name: api
+    port: 8000
+    targetPort: api

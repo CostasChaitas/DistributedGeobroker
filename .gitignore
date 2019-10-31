@@ -5,6 +5,24 @@ target
 .idea/
 *.iml
 
+
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+eks-state
+
+# .tfvars files
+*.tfvars
+
+*config-map-aws-auth.yaml*
+
+*node_modules/*
+
+
+
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839

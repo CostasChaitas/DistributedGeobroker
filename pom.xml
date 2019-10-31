@@ -15,6 +15,7 @@
     <akka.version>2.5.23</akka.version>
     <akka.http.version>10.1.8</akka.http.version>
     <akka.management.version>1.0.0</akka.management.version>
+    <akka.cluster.bootstrap.version>1.0.3</akka.cluster.bootstrap.version>
     <kotlin.version>1.2.71</kotlin.version>
     <docker.image.version>1.0.0</docker.image.version>
   </properties>
@@ -85,6 +86,16 @@
       <groupId>com.lightbend.akka.management</groupId>
       <artifactId>akka-management_${scala.version}</artifactId>
       <version>${akka.management.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.lightbend.akka.management</groupId>
+      <artifactId>akka-management-cluster-bootstrap_${scala.version}</artifactId>
+      <version>${akka.cluster.bootstrap.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.lightbend.akka.discovery</groupId>
+      <artifactId>akka-discovery-kubernetes-api_${scala.version}</artifactId>
+      <version>${akka.cluster.bootstrap.version}</version>
     </dependency>
     <dependency>
       <groupId>com.lightbend.akka.management</groupId>

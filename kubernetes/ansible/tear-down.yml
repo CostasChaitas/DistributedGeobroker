@@ -1,0 +1,35 @@
+---
+- hosts: localhost
+  tasks:
+    - pip:
+        name: openshift
+
+    - name: delete namespace roles
+      k8s:
+        state: absent
+        src: ./roles/cluster-role-binding-namespace.yaml
+
+    - name: delete default roles
+      k8s:
+        state: absent
+        src: ./roles/cluster-role-binding-default.yaml
+
+    - name: delete the cluster namespace
+      k8s:
+        state: absent
+        src: ./namespaces/cluster-namespaces.yaml
+      
+    - name: delete the cluster deployment
+      k8s:
+        state: absent
+        src: ./cluster/cluster-deployment.yaml
+
+    - name: delete pod autoscaling
+      k8s:
+        state: absent
+        src: ./autoscaling/autoscaling.yaml
+    
+    - name: delete cluster service
+      k8s:
+        state: absent
+        src: ./cluster/cluster-service.yaml

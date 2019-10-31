@@ -37,7 +37,6 @@ public class WsServerActor extends AbstractActor {
         Config config = system.settings().config();
         String hostname = config.getString("application.api.hostname");
         int port = config.getInt("application.api.port");
-
         // Router
         Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =
                 routes.createRoute().flow(system, materializer);
