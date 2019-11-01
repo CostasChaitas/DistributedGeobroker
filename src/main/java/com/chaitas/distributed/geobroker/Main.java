@@ -5,50 +5,33 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.cluster.sharding.ClusterSharding;
 import akka.cluster.sharding.ClusterShardingSettings;
+import akka.management.cluster.bootstrap.ClusterBootstrap;
 import akka.management.javadsl.AkkaManagement;
 import com.chaitas.distributed.geobroker.Actors.WsServerActor;
 import com.chaitas.distributed.geobroker.Sharding.ClientMessageExtractor;
 import com.chaitas.distributed.geobroker.Sharding.ClientShardEntity;
-import com.chaitas.distributed.geobroker.Sharding.TopicMessageExtractor;
 import com.chaitas.distributed.geobroker.Sharding.TopicShardEntity;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import com.chaitas.distributed.geobroker.Sharding.TopicMessageExtractor;
 
 public class Main {
 
     public static void main(String[] args) {
-        Config baseConfig = ConfigFactory.load();
-        String actorSystemName = "distributed-geobroker";
-        // If we have added ports on the command line, then override them in the config and start multiple actor systems
-        if (args.length > 0) {
-            // Check that we have an even number of ports, one remoting and one http for each actor system
-            if (args.length % 2 == 1) {
-                System.out.println("[ERROR] Need an even number of ports! One remoting and one HttpServerActor port for each actor system.");
-                System.exit(1);
-            }
-            for (int i = 0; i < args.length; i += 2) {
-                String remoting = args[i];
-                String http = args[i + 1];
-                // Override the configuration of the port
-                Config config = ConfigFactory.parseString(
-                        "akka.remote.netty.tcp.port = " + remoting + "\n" +
-                                "application.api.port = " + http).withFallback(baseConfig);
-                createAndStartActorSystem(actorSystemName, config);
-            }
-        }
-        else {
-            createAndStartActorSystem(actorSystemName, baseConfig);
-        }
+        startupClusterNode();
     }
 
-    private static void createAndStartActorSystem(String name, Config config) {
+    private static void startupClusterNode() {
+        String actorSystemName = "distributed-geobroker";
         // Create an Akka system
-        ActorSystem system = ActorSystem.create(name, config);
-        // Start Akka management on the system
+        ActorSystem system = ActorSystem.create(actorSystemName);
+        // Start Akka management and Cluster Bootstrap on the system
         AkkaManagement.get(system).start();
+        ClusterBootstrap.get(system).start();
         // Set up and start Cluster Sharding
-        ClusterShardingSettings settings = ClusterShardingSettings.create(system);
+        setupClusterSharding(system);
+    }
 
+    private static void setupClusterSharding(ActorSystem system) {
+        ClusterShardingSettings settings = ClusterShardingSettings.create(system);
         ActorRef clientShardRegion = ClusterSharding.get(system).start(
                 "Clients",
                 Props.create(ClientShardEntity.class),
