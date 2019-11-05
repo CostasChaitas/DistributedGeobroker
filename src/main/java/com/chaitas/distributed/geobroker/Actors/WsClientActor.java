@@ -9,6 +9,8 @@ import com.chaitas.distributed.geobroker.Messages.ExternalMessages.Payloads.*;
 import com.chaitas.distributed.geobroker.Messages.ExternalMessages.ReasonCode;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.*;
 
+import java.util.UUID;
+
 public class WsClientActor extends AbstractActor {
 
     private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
@@ -107,6 +109,7 @@ public class WsClientActor extends AbstractActor {
                 default:
                     log.info("WsClientActor {} received message INCOMPATIBLE", wsClientActorId);
                     ExternalMessage externalMessage = new ExternalMessage(
+                            UUID.randomUUID().toString(),
                             "404",
                             ControlPacketType.INCOMPATIBLEPayload,
                             new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload)

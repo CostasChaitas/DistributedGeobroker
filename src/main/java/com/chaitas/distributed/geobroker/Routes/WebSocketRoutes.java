@@ -24,6 +24,7 @@ import com.chaitas.distributed.geobroker.Utils.JSONable;
 import com.chaitas.distributed.geobroker.Utils.KryoSerializerPool;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class WebSocketRoutes extends AllDirectives {
 
@@ -85,6 +86,7 @@ public class WebSocketRoutes extends AllDirectives {
                             Optional<ExternalMessage> message0 = JSONable.fromJSON(msg.asTextMessage().getStrictText(), ExternalMessage.class);
                             ExternalMessage message = message0.get();
                             return new ExternalMessage(
+                                    message.getId(),
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
@@ -92,6 +94,7 @@ public class WebSocketRoutes extends AllDirectives {
                         } catch(Exception e) {
                             System.out.println("Received an incompatible Text Message: +" + msg);
                             return new ExternalMessage(
+                                    UUID.randomUUID().toString(),
                                     "404",
                                     ControlPacketType.INCOMPATIBLEPayload,
                                     new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload)
@@ -105,6 +108,7 @@ public class WebSocketRoutes extends AllDirectives {
                             byte[] arr = msg1.toArray();
                             ExternalMessage message = (ExternalMessage) kryo.read(arr, ExternalMessage.class);
                             return new ExternalMessage(
+                                    message.getId(),
                                     message.getClientIdentifier(),
                                     message.getControlPacketType(),
                                     message.getPayload()
@@ -112,6 +116,7 @@ public class WebSocketRoutes extends AllDirectives {
                         } catch(Exception e) {
                             System.out.println("Received an incompatible Binary Message: +" + msg);
                             return new ExternalMessage(
+                                    UUID.randomUUID().toString(),
                                     "404",
                                     ControlPacketType.INCOMPATIBLEPayload,
                                     new INCOMPATIBLEPayload(ReasonCode.IncompatiblePayload)
