@@ -24,10 +24,10 @@
         state: present
         src: ./cluster/cluster-deployment.yaml
 
-    - name: create pod autoscaling
-      k8s:
-        state: present
-        src: ./autoscaling/autoscaling.yaml
+#    - name: create pod autoscaling
+#      k8s:
+#        state: present
+#        src: ./autoscaling/autoscaling.yaml
 
     - name: create cluster service
       k8s:

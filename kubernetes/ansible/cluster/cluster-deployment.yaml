@@ -4,7 +4,7 @@ metadata:
   name: distributed-geobroker
   namespace: distributed-geobroker-namespace
 spec:
-  replicas: 10
+  replicas: 8
   selector:
     matchLabels:
       app: distributed-geobroker
@@ -20,12 +20,12 @@ spec:
     spec:
       serviceAccountName: distributed-geobroker
       containers:
-      - image: rasakos/distributed-geobroker:1.1.0
+      - image: rasakos/distributed-geobroker:1.3.0
         imagePullPolicy: IfNotPresent
         name: distributed-geobroker
         resources:
           requests:
-            cpu: "20m"
+            cpu: "200m"
         env:
         - name: HOSTNAME
           valueFrom:

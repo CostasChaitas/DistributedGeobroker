@@ -61,6 +61,7 @@ public class ClientShardEntity extends AbstractActor {
             for (Map.Entry<Topic, Subscription> subValue : subscriptions.entrySet()) {
                 Subscription sub = subValue.getValue();
                 ExternalMessage SUBSCRIBE = new ExternalMessage(
+                        processCONNECT.message.getId(),
                         sub.getSubscriptionId().getLeft(),
                         ControlPacketType.SUBSCRIBE,
                         new SUBSCRIBEPayload(sub.getTopic(), sub.getGeofence())
@@ -76,6 +77,7 @@ public class ClientShardEntity extends AbstractActor {
         // Sending ACK
         CONNACKPayload connackPayload = new CONNACKPayload(ReasonCode.Success);
         ExternalMessage CONNACK = new ExternalMessage(
+                processCONNECT.message.getId(),
                 processCONNECT.message.getClientIdentifier(),
                 ControlPacketType.CONNACK,
                 connackPayload
@@ -96,6 +98,7 @@ public class ClientShardEntity extends AbstractActor {
         if(this.clientLocation == null){
             PINGRESPPayload pingrespPayload = new PINGRESPPayload(ReasonCode.NotConnected);
             ExternalMessage NOTCONNECTED = new ExternalMessage(
+                    processPINGREQ.message.getId(),
                     processPINGREQ.message.getClientIdentifier(),
                     ControlPacketType.NOTCONNECTED,
                     pingrespPayload
@@ -108,6 +111,7 @@ public class ClientShardEntity extends AbstractActor {
         if(this.wsClientActor.compareTo(processPINGREQ.wsClientActor) != 0){
             PINGRESPPayload pingrespPayload = new PINGRESPPayload(ReasonCode.ConnectionAlreadyExist);
             ExternalMessage CONNECTIONEXIST = new ExternalMessage(
+                    processPINGREQ.message.getId(),
                     processPINGREQ.message.getClientIdentifier(),
                     ControlPacketType.CONNECTIONEXIST,
                     pingrespPayload
@@ -121,6 +125,7 @@ public class ClientShardEntity extends AbstractActor {
         // Sending ACK
         PINGRESPPayload pingrespPayload = new PINGRESPPayload(ReasonCode.Success);
         ExternalMessage PINGRESP = new ExternalMessage(
+                processPINGREQ.message.getId(),
                 processPINGREQ.message.getClientIdentifier(),
                 ControlPacketType.PINGRESP,
                 pingrespPayload
@@ -135,6 +140,7 @@ public class ClientShardEntity extends AbstractActor {
         if(this.clientLocation == null){
             UNSUBACKPayload unsubackPayload = new UNSUBACKPayload(ReasonCode.NotConnected);
             ExternalMessage NOTCONNECTED = new ExternalMessage(
+                    processUNSUBSCRIBE.message.getId(),
                     processUNSUBSCRIBE.message.getClientIdentifier(),
                     ControlPacketType.NOTCONNECTED,
                     unsubackPayload
@@ -147,6 +153,7 @@ public class ClientShardEntity extends AbstractActor {
         if(this.wsClientActor.compareTo(processUNSUBSCRIBE.wsClientActor) != 0){
             UNSUBACKPayload unsubackPayload = new UNSUBACKPayload(ReasonCode.ConnectionAlreadyExist);
             ExternalMessage CONNECTIONEXIST = new ExternalMessage(
+                    processUNSUBSCRIBE.message.getId(),
                     processUNSUBSCRIBE.message.getClientIdentifier(),
                     ControlPacketType.CONNECTIONEXIST,
                     unsubackPayload
@@ -162,6 +169,7 @@ public class ClientShardEntity extends AbstractActor {
         // Sending ACK
         UNSUBACKPayload unsubackPayload = new UNSUBACKPayload(ReasonCode.Success);
         ExternalMessage UNSUBACK = new ExternalMessage(
+                processUNSUBSCRIBE.message.getId(),
                 processUNSUBSCRIBE.message.getClientIdentifier(),
                 ControlPacketType.UNSUBACK,
                 unsubackPayload
@@ -176,6 +184,7 @@ public class ClientShardEntity extends AbstractActor {
         if(this.clientLocation == null){
             SUBACKPayload subackPayload = new SUBACKPayload(ReasonCode.NotConnected);
             ExternalMessage NOTCONNECTED = new ExternalMessage(
+                    processSUBSCRIBE.message.getId(),
                     processSUBSCRIBE.message.getClientIdentifier(),
                     ControlPacketType.NOTCONNECTED,
                     subackPayload
@@ -188,6 +197,7 @@ public class ClientShardEntity extends AbstractActor {
         if(this.wsClientActor.compareTo(processSUBSCRIBE.wsClientActor) != 0){
             SUBACKPayload subackPayload = new SUBACKPayload(ReasonCode.ConnectionAlreadyExist);
             ExternalMessage CONNECTIONEXIST = new ExternalMessage(
+                    processSUBSCRIBE.message.getId(),
                     processSUBSCRIBE.message.getClientIdentifier(),
                     ControlPacketType.CONNECTIONEXIST,
                     subackPayload
@@ -211,6 +221,7 @@ public class ClientShardEntity extends AbstractActor {
         // Sending ACK
         SUBACKPayload subackPayload = new SUBACKPayload(ReasonCode.Success);
         ExternalMessage SUBACK = new ExternalMessage(
+                processSUBSCRIBE.message.getId(),
                 processSUBSCRIBE.message.getClientIdentifier(),
                 ControlPacketType.SUBACK,
                 subackPayload
@@ -225,6 +236,7 @@ public class ClientShardEntity extends AbstractActor {
         if(this.clientLocation == null){
             PUBACKPayload pubackPayload = new PUBACKPayload(ReasonCode.NotConnected);
             ExternalMessage NOTCONNECTED = new ExternalMessage(
+                    processPUBLISH.message.getId(),
                     processPUBLISH.message.getClientIdentifier(),
                     ControlPacketType.NOTCONNECTED,
                     pubackPayload
@@ -237,6 +249,7 @@ public class ClientShardEntity extends AbstractActor {
         if(this.wsClientActor.compareTo(processPUBLISH.wsClientActor) != 0){
             PUBACKPayload pubackPayload = new PUBACKPayload(ReasonCode.ConnectionAlreadyExist);
             ExternalMessage CONNECTIONEXIST = new ExternalMessage(
+                    processPUBLISH.message.getId(),
                     processPUBLISH.message.getClientIdentifier(),
                     ControlPacketType.CONNECTIONEXIST,
                     pubackPayload
@@ -251,6 +264,7 @@ public class ClientShardEntity extends AbstractActor {
         // Sending ACK
         PUBACKPayload pubackPayload = new PUBACKPayload(ReasonCode.Success);
         ExternalMessage PUBACK = new ExternalMessage(
+                processPUBLISH.message.getId(),
                 processPUBLISH.message.getClientIdentifier(),
                 ControlPacketType.PUBACK,
                 pubackPayload
@@ -265,6 +279,7 @@ public class ClientShardEntity extends AbstractActor {
         Boolean isPublisherGeoMatching = publisherGeoMatching(publisherGeoMatching.publication);
         if(isPublisherGeoMatching){
             ExternalMessage externalMessage = new ExternalMessage(
+                    publisherGeoMatching.publication.message.getId(),
                     publisherGeoMatching.publication.message.getClientIdentifier(),
                     ControlPacketType.PUBLISH,
                     publisherGeoMatching.publication.message.getPayload().getPUBLISHPayload()
