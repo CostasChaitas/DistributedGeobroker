@@ -10,7 +10,7 @@ public class PublisherGeoMatching {
     public Subscription subscription;
 
     public PublisherGeoMatching(@NotNull @JsonProperty("publication") ProcessPUBLISH publication,
-                                @NotNull @JsonProperty("publication") Subscription subscription){
+                                @NotNull @JsonProperty("subscription") Subscription subscription){
         this.publication = publication;
         this.subscription = subscription;
     }

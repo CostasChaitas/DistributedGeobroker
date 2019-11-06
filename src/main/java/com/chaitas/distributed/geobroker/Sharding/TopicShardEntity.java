@@ -54,7 +54,10 @@ public class TopicShardEntity extends AbstractActor {
         log.info("TopicShardEntity {} received message ProcessUNSUBSCRIBE", topicShardId);
         // Unsubscribe
         Subscription subscription = subscriptions.get(processUNSUBSCRIBE.message.getClientIdentifier());
-        raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscription.getSubscriptionId());
+        if(subscription != null){
+            subscriptions.remove(processUNSUBSCRIBE.message.getClientIdentifier());
+            raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscription.getSubscriptionId());
+        }
     }
 
     private void receiveProcessSUBSCRIBE(ProcessSUBSCRIBE processSUBSCRIBE){
@@ -62,7 +65,6 @@ public class TopicShardEntity extends AbstractActor {
         // Check if client has been already subscribed and remove old subscriptions
         Subscription subscription = subscriptions.get(processSUBSCRIBE.subscription.getSubscriptionId().getLeft());
         if(subscription != null){
-            log.info("Subscription exist" );
             raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscription.getSubscriptionId());
         }
         // Register subscription for the client
