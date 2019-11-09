@@ -23,14 +23,14 @@ In order to deploy the general tools listed above, run the following command:
 sudo ansible-playbook set-up-addons.yaml
 ```
 
-In order to deploy the application run the following command: 
-```
-sudo ansible-playbook full-set-up.yaml
-```
-
 In order to deploy the monitoring system run the following command: 
 ```
 sudo ansible-playbook set-up-monitoring.yaml
+```
+
+In order to deploy the application run the following command: 
+```
+sudo ansible-playbook full-set-up.yaml
 ```
 
 ## Access the Kubernetes dashboard
@@ -45,7 +45,7 @@ In order to login, get your token using the following command:
 aws eks get-token --cluster-name distributed-geobroker-thesis | jq -r '.status.token'
 ```
 
-## Access Grafana dashboard
+## Access Prometheus and Grafana dashboard
 In order to use the Grafana dashboard that is already configured, you could use the following command: 
 ```
 kubectl port-forward -n monitoring service/prometheus-grafana 3000:80
@@ -57,6 +57,13 @@ kubectl get secret --namespace monitoring prometheus-grafana -o jsonpath="{.data
 ```
 
 Then you can use the following : http://localhost:3000. Username is admin.
+
+
+In order to use the Prometheus dashboard that is already configured, you could use the following command: 
+```
+kubectl port-forward -n monitoring prometheus-prometheus-prometheus-oper-prometheus-0 9090
+```
+Then you can use the following : http://localhost:9090.
 
 
 ### Cleaning up

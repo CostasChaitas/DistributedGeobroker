@@ -5,11 +5,11 @@ import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
-import com.chaitas.distributed.geobroker.Storage.Raster;
+import com.chaitas.distributed.geobroker.Messages.InternalMessages.PublisherGeoMatching;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessPUBLISH;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessSUBSCRIBE;
 import com.chaitas.distributed.geobroker.Messages.InternalMessages.ProcessUNSUBSCRIBE;
-import com.chaitas.distributed.geobroker.Messages.InternalMessages.PublisherGeoMatching;
+import com.chaitas.distributed.geobroker.Storage.Raster;
 import com.chaitas.distributed.geobroker.Storage.Subscription;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
@@ -54,7 +54,10 @@ public class TopicShardEntity extends AbstractActor {
         log.info("TopicShardEntity {} received message ProcessUNSUBSCRIBE", topicShardId);
         // Unsubscribe
         Subscription subscription = subscriptions.get(processUNSUBSCRIBE.message.getClientIdentifier());
-        raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscription.getSubscriptionId());
+        if(subscription != null){
+            subscriptions.remove(processUNSUBSCRIBE.message.getClientIdentifier());
+            raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscription.getSubscriptionId());
+        }
     }
 
     private void receiveProcessSUBSCRIBE(ProcessSUBSCRIBE processSUBSCRIBE){
@@ -62,7 +65,6 @@ public class TopicShardEntity extends AbstractActor {
         // Check if client has been already subscribed and remove old subscriptions
         Subscription subscription = subscriptions.get(processSUBSCRIBE.subscription.getSubscriptionId().getLeft());
         if(subscription != null){
-            log.info("Subscription exist" );
             raster.removeSubscriptionIdFromRasterEntries(subscription.getGeofence(), subscription.getSubscriptionId());
         }
         // Register subscription for the client
